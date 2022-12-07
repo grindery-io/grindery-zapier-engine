@@ -23,7 +23,7 @@ app.post("/push", async(req, res)=>{
     shell.exec(`zapier push`)
     path = `../../`
     shell.cd(path)
-    shell.rm('-rf', "C:/Users/juanm/Documents/ConnexDigital/GrinderyPublic/connex-grindery");
+    shell.rm('-rf', "./GrinderyPublic/connex-grindery");
     res.sendFile('index.html', {root: __dirname}); 
 })
 
