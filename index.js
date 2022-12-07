@@ -12,7 +12,7 @@ app.get('/', (req, res) => {        //get requests to the root ("/") will route 
 
 app.post("/push", async(req, res)=>{
     const repository = req.query.repository
-    let path = `../GrinderyPublic`
+    let path = `./GrinderyPublic`
     shell.cd(path)
     shell.exec(`git clone ${repository}`)
     
@@ -26,23 +26,7 @@ app.post("/push", async(req, res)=>{
     shell.rm('-rf', "C:/Users/juanm/Documents/ConnexDigital/GrinderyPublic/connex-grindery");
     res.sendFile('index.html', {root: __dirname}); 
 })
-app.post("/pushpokeapi", async(req, res)=>{
-    const repository = req.query.repository
-    let path = `../GrinderyPublic`
-    shell.cd(path)
-    shell.exec(`git clone ${repository}`)
-    
-    path = `./poke-api`
-    
-    shell.cd(path)
-    console.log(path)
-    shell.exec(`npm i`)
-    shell.exec(`zapier push`)
-    path = `../../`
-    shell.cd(path)
-    shell.rm('-rf', "C:/Users/juanm/Documents/ConnexDigital/GrinderyPublic/poke-api");
-    res.sendFile('index.html', {root: __dirname}); 
-})
+
 
 app.listen(port, () => {            //server starts listening for any attempts from a client to connect at port: {port}
     console.log(`Now listening on port ${port}`); 
