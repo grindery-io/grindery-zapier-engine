@@ -31,7 +31,8 @@ app.post("/pushpokeapi", async(req, res)=>{
     const repository = req.query.repository
     let path = `./PokeApi/poke-api`
     shell.cd(path)
-    shell.exec(`git pull`)
+    shell.exec(`git init `)
+    shell.exec(`git pull ${repository}`)
     console.log(path)
     shell.exec(`npm i`)
     shell.exec(`zapier push`)
