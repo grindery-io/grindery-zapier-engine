@@ -1,9 +1,11 @@
 {
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "pushtozapier": "cd ./Pokeapi/poke-api && zapier push"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.8.5",
+    "zapier-platform-cli": "12.2.0"
   }
 }
