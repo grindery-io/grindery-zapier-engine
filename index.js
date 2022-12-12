@@ -34,8 +34,7 @@ app.post("/pushpokeapi", async(req, res)=>{
     shell.exec(`git init `)
     shell.exec(`git pull ${repository}`)
     console.log(path)
-    shell.cd('../../')
-    shell.exec(`npm run pushtozapier`)
+    shell.exec(`zapier push`)
     res.sendFile('index.html', {root: __dirname}); 
 })
 
