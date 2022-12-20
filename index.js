@@ -33,6 +33,8 @@ app.post("/pushpokeapi", async(req, res)=>{
     console.log(path)
     shell.exec(`npm i`)
     //shell.exec(`zapier login`)
+    path = `../../`
+    shell.cd(path)
     shell.exec(`npm run pushtozapier`)
     res.sendFile('index.html', {root: __dirname}); 
 })
