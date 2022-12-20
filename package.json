@@ -1,7 +1,10 @@
 {
   "scripts": {
     "start": "node index.js",
-    "pushtozapier": "cd ./Pokeapi/poke-api && zapier push"
+    "pushtozapier": "cd ./Pokeapi/poke-api && zapier push",
+    "login": "echo '9f4c03fa427d81d0ee85dcc69abab093' | zapier login --sso ",
+    "simplelogin": "zapier login --sso ",
+    "link": "zapier link"
   },
   "dependencies": {
     "express": "^4.18.2",

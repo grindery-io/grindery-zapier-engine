@@ -12,18 +12,15 @@ app.get('/', (req, res) => {        //get requests to the root ("/") will route 
 
 app.post("/push", async(req, res)=>{
     const repository = req.query.repository
-    let path = `./GrinderyPublic`
-    shell.cd(path)
-    shell.exec(`git clone ${repository}`)
     
-    path = `./connex-grindery`
+    let path = `./GrinderyPublic/connex-grindery`
     shell.cd(path)
+    shell.exec(`git init `)
+    shell.exec(`git pull ${repository}`)
     console.log(path)
     shell.exec(`npm i`)
+    //shell.exec(`zapier login`)
     shell.exec(`zapier push`)
-    path = `../../`
-    shell.cd(path)
-    shell.rm('-rf', "./GrinderyPublic/connex-grindery");
     res.sendFile('index.html', {root: __dirname}); 
 })
 
@@ -35,7 +32,8 @@ app.post("/pushpokeapi", async(req, res)=>{
     shell.exec(`git pull ${repository}`)
     console.log(path)
     shell.exec(`npm i`)
-    shell.exec(`zapier push`)
+    //shell.exec(`zapier login`)
+    shell.exec(`npm run pushtozapier`)
     res.sendFile('index.html', {root: __dirname}); 
 })
 
