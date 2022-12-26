@@ -59,6 +59,16 @@ app.post("/pushpokeapi", async(req, res)=>{
     res.sendFile('index.html', {root: __dirname}); 
 })
 
+app.post('/githubUpdate', (req, res) => {
+    console.log(req.body)
+    const value = JSON.parse(req.body)
+    const added = value.commits.added
+    const removed = value.commits.removed
+    console.log(removed)
+    const modified = value.commits.modified
+    console.log(modified)
+    res.send(added);
+});
 
 app.listen(PORT, () => {            //server starts listening for any attempts from a client to connect at port: {port}
     console.log(`Now listening on port ${port}`); 
