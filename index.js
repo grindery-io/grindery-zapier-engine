@@ -45,11 +45,14 @@ app.post("/pushpokeapi", async(req, res)=>{
 app.post('/githubUpdate', async(req, res) => {
     const value = req.body
     console.log(value)
-    const added = value.payload.commits[0].added
+    console.log(typeof value)
+   
+    const added = value.commits[0].added
     console.log(added)
-    const removed = value.payload.commits[0].removed
+    console.log(value.payload)
+    const removed = value.commits[0].removed
     console.log(removed)
-    const modified = value.payload.commits[0].modified
+    const modified = value.commits[0].modified
     console.log(modified)
     const obj = {
         added: added,
