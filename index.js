@@ -1,13 +1,14 @@
-import express from ('express'); //Import the express dependency
-const app = express();              //Instantiate an express app, the main work horse of this server         
-import shell from ('shelljs')    //for using the shell terminal
+import express from 'express'; //Import the express dependency
+import shell from 'shelljs'    //for using the shell terminal
 
-import {updateFile, createFile} from ("./src/CRUD.js") //crud files
-import {updateCDS} from ("./src/updateCDS.js") //updateCDS
+import {updateFile, createFile} from "./src/CRUD.js" //crud files
+import {updateCDS} from "./src/updateCDS.js" //updateCDS
 
 
-import jsondata from ('../erc20.json');
+import jsondata from '../erc20.json';
+
 const PORT = process.env.PORT || 5000; //define port
+const app = express();              //Instantiate an express app, the main work horse of this server       
 
 app.get('/updateCDS', (req, res)=>{
     const value = updateCDS(jsondata);
