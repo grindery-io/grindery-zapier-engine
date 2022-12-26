@@ -5,11 +5,11 @@ import {updateFile, createFile} from "./src/CRUD.js" //crud files
 import {updateCDS} from "./src/updateCDS.js" //updateCDS
 
 
-import {jsondata} from './erc20.json' assert { type: "json" };
+//import {jsondata} from './erc20.json' assert { type: "json" };
 
 const PORT = process.env.PORT || 5000; //define port
 const app = express();              //Instantiate an express app, the main work horse of this server       
-
+const jsonData = "hello world"
 app.get('/updateCDS', (req, res)=>{
     const value = updateCDS(jsondata);
     res.send(value);
@@ -72,5 +72,5 @@ app.post('/githubUpdate', (req, res) => {
 });
 
 app.listen(PORT, () => {            //server starts listening for any attempts from a client to connect at port: {port}
-    console.log(`Now listening on port ${port}`); 
+    console.log(`Now listening on port ${PORT}`); 
 });
