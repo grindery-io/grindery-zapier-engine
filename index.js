@@ -1,12 +1,32 @@
 const express = require('express'); //Import the express dependency
-const app = express();              //Instantiate an express app, the main work horse of this server
-const port = 5000;                  //Save the port number where your server will be listening
+const app = express();              //Instantiate an express app, the main work horse of this server         
 const shell = require('shelljs')    //for using the shell terminal
 
-//Idiomatic expression in express to route and respond to a client request
-app.get('/', (req, res) => {        //get requests to the root ("/") will route here
-    res.sendFile('index.html', {root: __dirname});      //server responds by sending the index.html file to the client's browser
-                                                        //the .sendFile method needs the absolute path to the file, see: https://expressjs.com/en/4x/api.html#res.sendFile 
+const {updateFile, createFile} = require("./src/CRUD.js") //crud files
+const {updateCDS} = require("./src/updateCDS.js") //updateCDS
+
+
+const jsondata = require('../erc20.json');
+const PORT = process.env.PORT || 5000; //define port
+
+app.get('/updateCDS', (req, res)=>{
+    const value = updateCDS(jsondata);
+    res.send(value);
+})
+
+// endpoint that runs the function and returns its value
+app.patch('/updateFile', (req, res) => {
+  const value = updateFile(jsondata);
+  res.send(value);
+});
+app.post('/createFile', (req, res) => {
+    const value = createFile(jsondata);
+    res.send(value);
+});
+
+app.post('/githubUpdate', (req, res) => {
+    const value = ""
+    res.send(value);
 });
 
 
@@ -40,6 +60,6 @@ app.post("/pushpokeapi", async(req, res)=>{
 })
 
 
-app.listen(process.env.PORT || port, () => {            //server starts listening for any attempts from a client to connect at port: {port}
+app.listen(PORT, () => {            //server starts listening for any attempts from a client to connect at port: {port}
     console.log(`Now listening on port ${port}`); 
 });
