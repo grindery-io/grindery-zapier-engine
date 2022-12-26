@@ -44,6 +44,7 @@ app.post("/pushpokeapi", async(req, res)=>{
 
 app.post('/githubUpdate', async(req, res) => {
     const value = req.body
+    console.log(value)
     const added = value.commits.added
     console.log(added)
     const removed = value.commits.removed
