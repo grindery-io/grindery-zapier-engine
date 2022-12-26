@@ -1,4 +1,4 @@
-const shell = require('shelljs')    //for using the shell terminal
+import shell from ("shelljs")  //for using the shell terminal
 
 export const updateCDS = async () => {
     try {
