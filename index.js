@@ -43,7 +43,7 @@ app.post("/pushpokeapi", async(req, res)=>{
 })
 
 app.post('/githubUpdate', async(req, res) => {
-    const value = req.body
+    const value = JSON.parse(req.body.payload)
     console.log(value)
     console.log(typeof value)
    
