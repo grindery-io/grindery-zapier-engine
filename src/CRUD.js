@@ -15,21 +15,21 @@ export const mainCRUD = async(object) =>{
     //{ added: ['web3/test5 copy.json'], removed: [ 'web3/test5 copy.json' ], modified: ['web3/test5 copy.json'] }
     if(object.added.length != 0){
         for(var i = 0; i <= object.added.length; i++){
-            console.log(object.added)
+            console.log(object.added[i])
             var output = object.added[i].split("/").pop().split(".")[0];
             crudFunction(output, "added")
         }  
     }
     if(object.removed.length != 0){
         for(var i = 0; i <= object.removed.length; i++){
-            console.log(object.removed)
+            console.log(object.removed[i])
             var output = object.removed[i].split("/").pop().split(".")[0];
             crudFunction(output, "removed")
         }  
     }
     if(object.modified.length != 0){
         for(var i = 0; i <= object.modified.length; i++){
-            console.log(object.modified)
+            console.log(object.modified[i])
             var output = object.modified[i].split("/").pop().split(".")[0];
             crudFunction(output, "modified")
         }  
