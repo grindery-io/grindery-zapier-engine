@@ -2,8 +2,8 @@ import express from 'express'; //Import the express dependency
 import shell from 'shelljs'    //for using the shell terminal
 import bp from 'body-parser'
 
-import {updateFile, createFile} from "./src/CRUD.js" //crud files
-import {updateCDS} from "./src/updateCDS.js" //updateCDS
+import { mainCRUD } from "./src/CRUD.js" //crud files
+import { updateCDS } from "./src/updateCDS.js" //updateCDS
 
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
@@ -57,6 +57,10 @@ app.post('/githubUpdate', async(req, res) => {
         modified: modified
     }
     console.log(obj);
+
+    //Update CDS from the github update
+    updateCDS();
+    mainCRUD()
     
     res.json(obj)
 });
