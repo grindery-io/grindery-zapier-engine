@@ -36,6 +36,16 @@ export const mainCRUD = async(object) =>{
     }
 }
 
+export const keyNames =(value) =>{
+    let output = []
+    for(var i = 0; i <= value.length; i++){
+        console.log(value[i])
+        var v = value[i].split("/").pop().split(".")[0];
+        output.push(v)
+    }  
+    return output
+} 
+
 const crudFunction = async(parseData, type) =>{
     await client.connect()  //connect
 

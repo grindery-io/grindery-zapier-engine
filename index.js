@@ -2,7 +2,7 @@ import express from 'express'; //Import the express dependency
 import shell from 'shelljs'    //for using the shell terminal
 import bp from 'body-parser'
 
-import { mainCRUD } from "./src/CRUD.js" //crud files
+import { mainCRUD, keyNames } from "./src/CRUD.js" //crud files
 import { updateCDS } from "./src/updateCDS.js" //updateCDS
 
 
@@ -44,12 +44,12 @@ app.post("/pushpokeapi", async(req, res)=>{
 
 app.post('/githubUpdate', async(req, res) => {
     const value = JSON.parse(req.body.payload)
-    const added = value.commits[0].added
+    const added = keyNames(value.commits[0].added)
     console.log(added)
     console.log(value.payload)
-    const removed = value.commits[0].removed
+    const removed = keyNames(value.commits[0].removed)
     console.log(removed)
-    const modified = value.commits[0].modified
+    const modified = keyNames(value.commits[0].modified)
     console.log(modified)
     const obj = {
         added: added,
@@ -66,6 +66,7 @@ app.post('/githubUpdate', async(req, res) => {
 });
 app.post('/testUpdate', async(req, res) => {
     const value = JSON.parse(req.body.payload)
+    const added = []
     const added = value.commits[0].added
     console.log(added)
     console.log(value.payload)
@@ -82,7 +83,7 @@ app.post('/testUpdate', async(req, res) => {
 
     //Update CDS from the github update
     updateCDS();
-    mainCRUD(obj)
+    //mainCRUD(obj)
     
     res.json(obj)
 });
