@@ -46,7 +46,6 @@ app.post('/githubUpdate', async(req, res) => {
     const value = JSON.parse(req.body.payload)
     const added = keyNames(value.commits[0].added)
     console.log(added)
-    console.log(value.payload)
     const removed = keyNames(value.commits[0].removed)
     console.log(removed)
     const modified = keyNames(value.commits[0].modified)

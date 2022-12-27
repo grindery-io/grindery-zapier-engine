@@ -1,6 +1,7 @@
 import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 import glob from "glob"
 import fs from 'fs'
+import e from "express";
 
 const uri = "mongodb+srv://connex_testing:MkLvwusz9i2K7mOT@cluster0.5d0qb9x.mongodb.net/?retryWrites=true&w=majority"//`mongodb+srv://${process.env.mongo_user}:${process.env.mongo_password}@cluster0.5d0qb9x.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -38,11 +39,18 @@ export const mainCRUD = async(object) =>{
 
 export const keyNames =(value) =>{
     let output = []
-    for(var i = 0; i <= value.length; i++){
-        console.log(value[i])
-        var v = value[i].split("/").pop().split(".")[0];
+    if(Array.isArray(value)){
+        for(var i = 0; i <= value.length; i++){
+            console.log(value[i])
+            var v = value[i].split("/").pop().split(".")[0];
+            output.push(v)
+        }  
+    }else{
+        console.log(value)
+        var v = value.split("/").pop().split(".")[0];
         output.push(v)
-    }  
+    }
+    
     return output
 } 
 
