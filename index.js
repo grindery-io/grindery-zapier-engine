@@ -60,7 +60,7 @@ app.post('/githubUpdate', async(req, res) => {
 
     //Update CDS from the github update
     updateCDS();
-    mainCRUD()
+    mainCRUD(obj)
     
     res.json(obj)
 });
