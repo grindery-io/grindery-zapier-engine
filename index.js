@@ -44,9 +44,6 @@ app.post("/pushpokeapi", async(req, res)=>{
 
 app.post('/githubUpdate', async(req, res) => {
     const value = JSON.parse(req.body.payload)
-    console.log(value)
-    console.log(typeof value)
-   
     const added = value.commits[0].added
     console.log(added)
     console.log(value.payload)
@@ -60,6 +57,8 @@ app.post('/githubUpdate', async(req, res) => {
         modified: modified
     }
     console.log(obj);
+    
+    res.json(obj)
 });
 
 app.listen(PORT, () => {            //server starts listening for any attempts from a client to connect at port: {port}
