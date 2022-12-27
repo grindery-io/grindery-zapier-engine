@@ -15,21 +15,21 @@ export const mainCRUD = async(object) =>{
     //this is how object should look
     //{ added: ['web3/test5 copy.json'], removed: [ 'web3/test5 copy.json' ], modified: ['web3/test5 copy.json'] }
     if(object.added.length != 0){
-        for(var i = 0; i <= object.added.length; i++){
+        for(var i = 0; i <= object.added.length - 1; i++){
             console.log(object.added[i])
             var output = object.added[i].split("/").pop().split(".")[0];
             crudFunction(output, "added")
         }  
     }
     if(object.removed.length != 0){
-        for(var i = 0; i <= object.removed.length; i++){
+        for(var i = 0; i <= object.removed.length - 1; i++){
             console.log(object.removed[i])
             var output = object.removed[i].split("/").pop().split(".")[0];
             crudFunction(output, "removed")
         }  
     }
     if(object.modified.length != 0){
-        for(var i = 0; i <= object.modified.length; i++){
+        for(var i = 0; i <= object.modified.length -1; i++){
             console.log(object.modified[i])
             var output = object.modified[i].split("/").pop().split(".")[0];
             crudFunction(output, "modified")
@@ -41,7 +41,7 @@ export const keyNames =(value) =>{
     let output = []
     console.log(Array.isArray(value))
     if(Array.isArray(value)){
-        for(var i = 0; i <= value.length; i++){
+        for(var i = 0; i <= value.length - 1; i++){
             console.log(value[i])
             var v = value[i].split("/").pop().split(".")[0];
             output.push(v)
