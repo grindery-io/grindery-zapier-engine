@@ -39,6 +39,7 @@ export const mainCRUD = async(object) =>{
 
 export const keyNames =(value) =>{
     let output = []
+    console.log(Array.isArray(value))
     if(Array.isArray(value)){
         for(var i = 0; i <= value.length; i++){
             console.log(value[i])
