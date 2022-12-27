@@ -60,33 +60,11 @@ app.post('/githubUpdate', async(req, res) => {
 
     //Update CDS from the github update
     updateCDS();
-    mainCRUD(obj)
-    
-    res.json(obj)
-});
-app.post('/testUpdate', async(req, res) => {
-    const value = JSON.parse(req.body.payload)
-    const added = []
-    const added = value.commits[0].added
-    console.log(added)
-    console.log(value.payload)
-    const removed = value.commits[0].removed
-    console.log(removed)
-    const modified = value.commits[0].modified
-    console.log(modified)
-    const obj = {
-        added: added,
-        removed: removed,
-        modified: modified
-    }
-    console.log(obj);
-
-    //Update CDS from the github update
-    updateCDS();
     //mainCRUD(obj)
     
     res.json(obj)
 });
+
 
 app.listen(PORT, () => {            //server starts listening for any attempts from a client to connect at port: {port}
     console.log(`Now listening on port ${PORT}`); 
