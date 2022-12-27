@@ -45,7 +45,7 @@ const crudFunction = async(parseData, type) =>{
     });
 
     console.log(search_result_key)
-    if(search_result_key != null){
+    if(search_result_key != null && type != "added"){
         // specify the path to the folder containing the files
         //const folderPath = '../grindery-nexus-schema-v2/cds/web3';
         const folderPath = '../test-cds-files/web3';
@@ -69,13 +69,16 @@ const crudFunction = async(parseData, type) =>{
                     console.log(delete_signal_result)
                 }
                 
-                if(type == "added" || type == "modified"){
+                if(type == "modified"){
                     const insert_signal_result = await collection.insertOne(parseContent)
                     console.log(insert_signal_result)
                 }
             }
             
         })
+    }else if(type == "added"){
+        const insert_signal_result = await collection.insertOne(parseContent)
+        console.log(insert_signal_result)
     }
     
 }
