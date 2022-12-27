@@ -66,10 +66,12 @@ const crudFunction = async(parseData, type) =>{
                     const delete_signal_result = await collection.deleteOne(
                         { key: parseData }
                     );
+                    console.log(delete_signal_result)
                 }
                 
                 if(type == "added" || type == "modified"){
                     const insert_signal_result = await collection.insertOne(parseContent)
+                    console.log(insert_signal_result)
                 }
             }
             
