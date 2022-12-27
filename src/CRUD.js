@@ -79,5 +79,3 @@ const crudFunction = async(parseData, type) =>{
     }
     
 }
-
-findFile("erc20")
