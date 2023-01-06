@@ -159,8 +159,8 @@ const pushDynamic = async(repository) => {
   shell.exec("dir .")
   shell.exec("rm -rf node_modules")
   shell.exec("npm i")
-  shell.exec('npm run ')
-  shell.exec('npm run link')
+
+  shell.exec('npm run pushdynamicLink')
   shell.exec(`npm run pushdynamic`);
 };
 
