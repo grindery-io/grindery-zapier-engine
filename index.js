@@ -70,8 +70,8 @@ app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
   //reporsitory = 
-  //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
-  //shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
+  shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
+  shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
   //format key name files
   const added = keyNames(value.commits[0].added);
   if(added != undefined){
@@ -101,6 +101,8 @@ const pushDynamic = async(repository) => {
   //shell.cd(`git clone ${repository}`)
   let path = `./dynamic-app`;
   shell.cd(path);
+  const files = shell.find(path)
+  console.log("files in dynamic-app", files)
   //shell.exec(`git init `);
   //shell.exec(`git pull ${repository}`);
   console.log("the shell path before npm i", path);
@@ -111,6 +113,8 @@ const pushDynamic = async(repository) => {
   updateVersion(); //update version before pushing to zapier
   console.log("test shell: ", shell.test('-d', 'path'))  // dir
   shell.cd(path);
+  const index1 = shell.find(path)
+  console.log("files in index dir", index1)
   shell.exec(`npm run pushdynamic`);
 };
 
