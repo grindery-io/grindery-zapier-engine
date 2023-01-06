@@ -72,20 +72,25 @@ app.post("/githubUpdate", async (req, res) => {
 
   //format key name files
   const added = keyNames(value.commits[0].added);
-  //const added= ["erc20", "erc721", "gnosisSafe"]
-  
-  // const removed = keyNames(value.commits[0].removed);
-  // console.log(removed);
-  for (let index = 0; index < added.length; index++) {
-    const element = added[index];
-    await runHidden("triggers", added[index])
-    await run("triggers", added[index])
+  if(added != undefined){
+    //const added= ["erc20", "erc721", "gnosisSafe"]
+    
+    // const removed = keyNames(value.commits[0].removed);
+    // console.log(removed);
+    for (let index = 0; index < added.length; index++) {
+      const element = added[index];
+      await runHidden("triggers", added[index])
+      await run("triggers", added[index])
+    }
+    
+    // push to zapier
+    await pushDynamic();
+    
+    res.status(200).json({"res": "hello"})
+  }else{
+    res.status(400).json({"res": "request again"})
   }
-  
-  // push to zapier
-  await pushDynamic();
-  
-  res.status(200).json({"res": "hello"})
+ 
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
 
