@@ -96,6 +96,25 @@ app.post("/githubUpdate", async (req, res) => {
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
 
+app.post("/pushPokeApi", async (req, res) => {
+  //parse payload from github webhook
+  shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/PokeApi"`)
+  let path = `./PokeApi`;
+  shell.exec("dir .");
+  shell.cd(path);
+  //shell.exec(`git init `);
+  //shell.exec(`git pull ${repository}`);
+  console.log("the shell path before npm i", path);
+  shell.exec(`npm i`);
+  path = `../`;
+  
+ 
+  shell.cd(path);
+  console.log("excute")
+  
+  shell.exec(`npm run pushtozapier`);
+})
+
 
 const pushDynamic = async(repository) => {
   //shell.cd(`git clone ${repository}`)

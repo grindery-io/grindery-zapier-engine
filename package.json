@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "node index.js",
-    "pushtozapier": "cd ./PokeApi/poke-api && zapier push",
+    "pushtozapier": "cd ./PokeApi && zapier push",
     "pushdynamic": "cd ./dynamic-app && zapier push",
     "pushdynamicLink": "cd ./dynamic-app && zapier link",
     "login": "echo 9f4c03fa427d81d0ee85dcc69abab093 | zapier login --sso ",
