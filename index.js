@@ -173,7 +173,7 @@ const pushDynamic = async(repository) => {
   
   shell.exec('git add .')
   shell.exec(`git commit -m "some message"`)
-  shell.exec(`git push "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
+  shell.exec(`git push "https://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@github.com/connex-clientaccess/dynamic-app"`)
   console.log("after update version")
   shell.cd("..")
 
