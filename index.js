@@ -116,6 +116,8 @@ app.post("/runPull", async (req, res) => {
   shell.exec(`dir .`)
   shell.cd(path) //inside dynamic
   shell.exec(`git init `)
+  shell.exec(`git config user.email clientaccess@connex.digital`)
+  shell.exec(`git config user.name connex-clientaccess`)
   shell.exec(`git pull ${repository}`)
   console.log(path)
   shell.exec(`npm i`)
