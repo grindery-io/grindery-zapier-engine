@@ -89,7 +89,7 @@ app.post("/githubUpdate", async (req, res) => {
     
     // push to zapier
     await pushDynamic();
-    await sendNotification()
+    //await sendNotification()
     
     res.status(200).json({"res": "hello"})
   }else{
@@ -127,22 +127,22 @@ app.post("/runPull", async (req, res) => {
   console.log("back to root folder")
   shell.exec(`dir .`)
 })
-app.post("/runPush", async (req, res) => {
+// app.post("/runPush", async (req, res) => {
   
-  let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
-  pullDynamic(repository)
-  console.log("root folder")
-  shell.exec("dir .")
-  //shell.cd("..")
-  console.log("after")
-  updateVersion(); //update version before pushing to zapier
-  shell.cd("..")
-  console.log("after update version")
-  shell.exec("dir .")
+//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+//   pullDynamic(repository)
+//   console.log("root folder")
+//   shell.exec("dir .")
+//   //shell.cd("..")
+//   console.log("after")
+//   updateVersion(); //update version before pushing to zapier
+//   shell.cd("..")
+//   console.log("after update version")
+//   shell.exec("dir .")
 
-  //shell.exec('npm run pushdynamicLink')
-  shell.exec(`npm run pushdynamic`);
-})
+//   //shell.exec('npm run pushdynamicLink')
+//   shell.exec(`npm run pushdynamic`);
+// })
 
 const pullDynamic = repository =>{
   
@@ -181,26 +181,26 @@ const pushDynamic = async(repository) => {
   shell.exec(`npm run pushdynamic`);
 };
 
-app.post("/pushPokeApi", async (req, res) => {
-  //parse payload from github webhook
-  shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/PokeApi"`)
-  let path = `./PokeApi`;
-  shell.exec("dir .");
-  shell.cd(path);
-  //shell.exec(`git init `);
-  //shell.exec(`git pull ${repository}`);
-  console.log("the shell path before npm i", path);
-  shell.exec(`npm i`);
-  path = `../`;
+// app.post("/pushPokeApi", async (req, res) => {
+//   //parse payload from github webhook
+//   shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/PokeApi"`)
+//   let path = `./PokeApi`;
+//   shell.exec("dir .");
+//   shell.cd(path);
+//   //shell.exec(`git init `);
+//   //shell.exec(`git pull ${repository}`);
+//   console.log("the shell path before npm i", path);
+//   shell.exec(`npm i`);
+//   path = `../`;
   
  
-  shell.cd(path);
-  console.log("excute")
-  shell.exec("rm -rf node_modules")
-  shell.exec("npm i")
+//   shell.cd(path);
+//   console.log("excute")
+//   shell.exec("rm -rf node_modules")
+//   shell.exec("npm i")
   
-  shell.exec(`npm run pushtozapier`);
-})
+//   shell.exec(`npm run pushtozapier`);
+// })
 
 
 
