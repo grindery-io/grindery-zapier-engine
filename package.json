@@ -2,6 +2,8 @@
   "scripts": {
     "start": "node index.js",
     "pushtozapier": "cd ./PokeApi/poke-api && zapier push",
+    "pushdynamic": "cd ./dynamic-app && zapier push",
+    "pushdynamicLink": "cd ./dynamic-app && zapier link",
     "login": "echo 9f4c03fa427d81d0ee85dcc69abab093 | zapier login --sso ",
     "simplelogin": "zapier login --sso ",
     "link": "zapier link"
@@ -12,7 +14,11 @@
     "express": "^4.18.2",
     "glob": "^8.0.3",
     "mongodb": "^4.13.0",
+    "replace-in-file": "^6.3.5",
     "shelljs": "^0.8.5",
+    "util": "^0.12.5",
+    "zapier-cli": "^1.0.0",
     "zapier-platform-cli": "12.2.0"
-  }
+  },
+  "version": "0.0.4"
 }
