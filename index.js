@@ -174,6 +174,8 @@ app.post("/pushPokeApi", async (req, res) => {
  
   shell.cd(path);
   console.log("excute")
+  shell.exec("rm -rf node_modules")
+  shell.exec("npm i")
   
   shell.exec(`npm run pushtozapier`);
 })
