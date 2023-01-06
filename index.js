@@ -108,7 +108,7 @@ app.post("/githubUpdate", async (req, res) => {
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      const isTrigger = checkIftriggerOrAction()
+      const isTrigger = checkIftriggerOrAction(added[index], 1)
       if(isTrigger == true){
         await runHidden("triggers", added[index])
         await run("triggers", added[index])
