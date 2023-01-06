@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node index.js",
     "pushtozapier": "cd ./PokeApi && zapier push",
-    "pushdynamic": "cd ./dynamic-app && zapier push",
+    "pushdynamic": "cd ./dynamic-app && zapier push --disable-dependency-detection",
     "pushdynamicLink": "cd ./dynamic-app && zapier link",
     "login": "echo 9f4c03fa427d81d0ee85dcc69abab093 | zapier login --sso ",
     "simplelogin": "zapier login --sso ",
