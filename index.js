@@ -29,7 +29,7 @@ async function runHidden(type, generatedTrigger) {
     const modified = data.replace(/replaceTrigger/g, generatedTrigger);
     await writeFile(filePath, modified, 'utf8');
   } catch (error) {
-    console.log(error);
+    console.log("runHidden ", error);
   }
 }
 
@@ -42,7 +42,7 @@ async function run(type, generatedTrigger) {
     await writeFile(filePath, modified, 'utf8');
     await addToIndex(generatedTrigger, type)
   } catch (error) {
-    console.log(error);
+    console.log("run ", error);
   }
 }
 
@@ -62,7 +62,7 @@ const addToIndex = async(value, type) => {
     return res
     
   } catch (error) {
-    console.log(error)
+    console.log("addToIndex ", error)
   }
 };
 
@@ -96,10 +96,11 @@ const pushDynamic = async(repository) => {
   shell.exec(`git pull ${repository}`);
   console.log(path);
   shell.exec(`npm i`);
-
+  
   //shell.exec(`zapier login`)
   path = `../`;
   updateVersion(); //update version before pushing to zapier
+  shell.test('-d', 'path')  // dir
   shell.cd(path);
   shell.exec(`npm run pushdynamic`);
 };
