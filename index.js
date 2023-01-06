@@ -93,10 +93,7 @@ app.post("/githubUpdate", async (req, res) => {
  
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
-app.post("/cloneDynamic", async (req, res) => {
-  shell.exec(`git clone "https://github.com/connex-clientaccess/dynamic-app"`)
-  shell.exec(`git clone "https://github.com/grindery-io/grindery-nexus-schema-v2"`)
-})
+
 
 const pushDynamic = async(repository) => {
   let path = `./dynamic-app`;
