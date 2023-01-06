@@ -125,6 +125,7 @@ app.post("/runPush", async (req, res) => {
   console.log("after update version")
   shell.exec("dir .")
 
+  shell.exec('npm run pushdynamicLink')
   shell.exec(`npm run pushdynamic`);
 })
 
