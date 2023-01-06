@@ -69,7 +69,9 @@ const addToIndex = async(value, type) => {
 app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
-
+  //reporsitory = 
+  shell.cd(`git clone "https://github.com/connex-clientaccess/dynamic-app"`)
+  shell.cd(`git clone "https://github.com/grindery-io/grindery-nexus-schema-v2"`)
   //format key name files
   const added = keyNames(value.commits[0].added);
   if(added != undefined){
@@ -96,10 +98,11 @@ app.post("/githubUpdate", async (req, res) => {
 
 
 const pushDynamic = async(repository) => {
+  //shell.cd(`git clone ${repository}`)
   let path = `./dynamic-app`;
   shell.cd(path);
-  shell.exec(`git init `);
-  shell.exec(`git pull ${repository}`);
+  //shell.exec(`git init `);
+  //shell.exec(`git pull ${repository}`);
   console.log(path);
   shell.exec(`npm i`);
   
