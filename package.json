@@ -18,12 +18,12 @@
     "shelljs": "^0.8.5",
     "util": "^0.12.5",
     "zapier-cli": "^1.0.0",
-    "zapier-platform-cli": "12.2.0"
+    "zapier-platform-cli": "12.2.0",
+    "zapier-platform-core": "12.2.0"
   },
   "version": "0.0.4",
   "name": "new-grindery-update",
   "main": "index.js",
-  "devDependencies": {},
   "author": "",
   "license": "ISC",
   "description": ""
