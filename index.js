@@ -88,10 +88,14 @@ app.post("/githubUpdate", async (req, res) => {
     
     res.status(200).json({"res": "hello"})
   }else{
-    res.status(400).json({"res": "request again"})
+    res.status(400).json({"res": "request again", "payload": value})
   }
  
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
+})
+app.post("/cloneDynamic", async (req, res) => {
+  shell.exec(`git clone "https://github.com/connex-clientaccess/dynamic-app"`)
+  shell.exec(`git clone "https://github.com/grindery-io/grindery-nexus-schema-v2"`)
 })
 
 const pushDynamic = async(repository) => {
@@ -109,6 +113,8 @@ const pushDynamic = async(repository) => {
   shell.cd(path);
   shell.exec(`npm run pushdynamic`);
 };
+
+
 
 const generateCDSfiles = async(cds) => {
   try {
