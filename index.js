@@ -112,7 +112,6 @@ const pushDynamic = async(repository) => {
   updateVersion(); //update version before pushing to zapier
   shell.exec("dir .");
   shell.cd(path);
-  const index1 = shell.find(path)
   console.log("files in index dir", index1)
   shell.exec(`npm run pushdynamic`);
 };
