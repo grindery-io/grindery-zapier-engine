@@ -112,8 +112,9 @@ const pushDynamic = async(repository) => {
   updateVersion(); //update version before pushing to zapier
   shell.exec("dir .");
   shell.cd(path);
+  console.log("excute")
   shell.exec("dir .");
-  shell.exec("npm i")
+  shell.exec("npm install -g zapier-platform-cli")
   shell.exec(`npm run pushdynamic`);
 };
 
