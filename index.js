@@ -116,8 +116,7 @@ app.post("/runPull", async (req, res) => {
   shell.exec(`dir .`)
   shell.cd(path) //inside dynamic
   shell.exec(`git init `)
-  shell.exec(`git config user.email clientaccess@connex.digital`)
-  shell.exec(`git config user.name connex-clientaccess`)
+
   shell.exec(`git pull ${repository}`)
   console.log(path)
   shell.exec(`npm i`)
@@ -171,6 +170,9 @@ const pushDynamic = async(repository) => {
   console.log("after")
   updateVersion(); //update version before pushing to zapier
   
+  shell.exec('git init')
+  shell.exec(`git config user.email clientaccess@connex.digital`)
+  shell.exec(`git config user.name connex-clientaccess`)
   shell.exec('git add .')
   shell.exec(`git commit -m "some message"`)
   shell.exec(`git push "https://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@github.com/connex-clientaccess/dynamic-app"`)
