@@ -118,15 +118,17 @@ app.post("/pushPokeApi", async (req, res) => {
 const pullDynamic = repository =>{
   
     let path = `./dynamic-app`
-    shell.cd(path)
+    shell.cd(path) //inside dynamic
     shell.exec(`git init `)
     shell.exec(`git pull ${repository}`)
     console.log(path)
     shell.exec(`npm i`)
-    shell.cd("../")
+    shell.exec("cd ..") //back to index
 }
 const pushDynamic = async(repository) => {
-  shell.cd("../")
+  shell.exec("dir .")
+  shell.exec("cd ..")
+  console.log("after")
   updateVersion(); //update version before pushing to zapier
   shell.exec("dir .")
   shell.exec(`npm run pushdynamic`);
