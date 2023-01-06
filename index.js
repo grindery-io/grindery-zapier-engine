@@ -65,12 +65,12 @@ const addToIndex = async(value, type) => {
     console.log("addToIndex ", error)
   }
 };
-
 app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
   //reporsitory = 
-  shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
+  //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
+  pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
   shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
   //format key name files
   const added = keyNames(value.commits[0].added);
@@ -115,27 +115,23 @@ app.post("/pushPokeApi", async (req, res) => {
   shell.exec(`npm run pushtozapier`);
 })
 
-
-const pushDynamic = async(repository) => {
-  //shell.cd(`git clone ${repository}`)
-  let path = `./dynamic-app`;
-  shell.exec("dir .");
-  shell.cd(path);
-  //shell.exec(`git init `);
-  //shell.exec(`git pull ${repository}`);
-  console.log("the shell path before npm i", path);
-  shell.exec(`npm i`);
+const pullDynamic = repository =>{
   
-  //shell.exec(`zapier login`)
-  path = `../`;
+    let path = `./dynamic-app`
+    shell.cd(path)
+    shell.exec(`git init `)
+    shell.exec(`git pull ${repository}`)
+    console.log(path)
+    shell.exec(`npm i`)
+    shell.cd("../")
+}
+const pushDynamic = async(repository) => {
+  
   updateVersion(); //update version before pushing to zapier
-  shell.exec("dir .");
-  shell.cd(path);
-  console.log("excute")
-  shell.exec("dir .");
-  shell.exec("npm install -g zapier-platform-cli")
+  
   shell.exec(`npm run pushdynamic`);
 };
+
 
 
 
