@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node index.js",
     "pushtozapier": "cd ./PokeApi && zapier push",
-    "pushdynamic": "cd ./dynamic-app && zapier push --disable-dependency-detection",
+    "pushdynamic": "cd ./dynamic-app && zapier push",
     "pushdynamicLink": "cd ./dynamic-app && zapier link",
     "login": "echo 9f4c03fa427d81d0ee85dcc69abab093 | zapier login --sso ",
     "simplelogin": "zapier login --sso ",
@@ -20,5 +20,11 @@
     "zapier-cli": "^1.0.0",
     "zapier-platform-cli": "12.2.0"
   },
-  "version": "0.0.4"
+  "version": "0.0.4",
+  "name": "new-grindery-update",
+  "main": "index.js",
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
