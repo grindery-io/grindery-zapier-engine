@@ -47,7 +47,7 @@ async function run(type, generatedTrigger) {
 }
 
 const addToIndex = async(value, type) => {
-  let counter = 23
+  let counter = 18
   // Read the contents of the file
   try {
     const readRes = await readFile("./dynamic-app/index.js", "utf8")
