@@ -70,8 +70,9 @@ app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload);
   //reporsitory = 
   //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
-  pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
+ 
   shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
+  pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
   //format key name files
   const added = keyNames(value.commits[0].added);
   if(added != undefined){
@@ -86,7 +87,7 @@ app.post("/githubUpdate", async (req, res) => {
     }
     
     // push to zapier
-    await pushDynamic();
+    //await pushDynamic();
     
     res.status(200).json({"res": "hello"})
   }else{
@@ -95,6 +96,32 @@ app.post("/githubUpdate", async (req, res) => {
  
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
+
+
+const pullDynamic = repository =>{
+  
+    let path = `./dynamic-app`
+    console.log("root folder")
+    shell.exec(`dir .`)
+    shell.cd(path) //inside dynamic
+    shell.exec(`git init `)
+    shell.exec(`git pull ${repository}`)
+    console.log(path)
+    shell.exec(`npm i`)
+    console.log("after install")
+    shell.exec(`dir .`)
+    shell.exec("cd ..") //back to index
+    console.log("back to root folder")
+    shell.exec(`dir .`)
+}
+// const pushDynamic = async(repository) => {
+//   shell.exec("dir .")
+//   //shell.cd("..")
+//   console.log("after")
+//   updateVersion(); //update version before pushing to zapier
+//   shell.exec("dir .")
+//   shell.exec(`npm run pushdynamic`);
+// };
 
 app.post("/pushPokeApi", async (req, res) => {
   //parse payload from github webhook
@@ -114,26 +141,6 @@ app.post("/pushPokeApi", async (req, res) => {
   
   shell.exec(`npm run pushtozapier`);
 })
-
-const pullDynamic = repository =>{
-  
-    let path = `./new-grindery-update/dynamic-app`
-    shell.cd(path) //inside dynamic
-    shell.exec(`git init `)
-    shell.exec(`git pull ${repository}`)
-    console.log(path)
-    shell.exec(`npm i`)
-    shell.exec("cd ..") //back to index
-}
-const pushDynamic = async(repository) => {
-  shell.exec("dir .")
-  shell.cd("..")
-  console.log("after")
-  updateVersion(); //update version before pushing to zapier
-  shell.exec("dir .")
-  shell.exec(`npm run pushdynamic`);
-};
-
 
 
 
