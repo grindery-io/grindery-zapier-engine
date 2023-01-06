@@ -68,7 +68,7 @@ const addToIndex = async(value, type) => {
 };
 
 //Example to use console.log(checkIftriggerOrAction("algorand", 1))
-const checkIftriggerOrAction = (value, type) => {
+const checkIftriggerOrAction = async(value, type) => {
   //Trigger = 1, Action = 2 @Juan
   const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
 
@@ -108,7 +108,7 @@ app.post("/githubUpdate", async (req, res) => {
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      const isTrigger = checkIftriggerOrAction(added[index], 1)
+      const isTrigger = await checkIftriggerOrAction(added[index], 1)
       if(isTrigger == true){
         await runHidden("triggers", added[index])
         await run("triggers", added[index])
