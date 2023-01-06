@@ -112,6 +112,20 @@ app.post("/runPull", async (req, res) => {
   console.log("back to root folder")
   shell.exec(`dir .`)
 })
+app.post("/runPush", async (req, res) => {
+  
+  let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+  pullDynamic(repository)
+  console.log("root folder")
+  shell.exec("dir .")
+  //shell.cd("..")
+  console.log("after")
+  updateVersion(); //update version before pushing to zapier
+  shell.cd("..")
+  console.log("after update version")
+  shell.exec("dir .")
+  shell.exec(`npm run pushdynamic`);
+})
 
 const pullDynamic = repository =>{
   
