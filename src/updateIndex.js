@@ -32,10 +32,7 @@ export const addToIndex = (value, type) => {
   }
   
 };
-export const updateVersion = () => {
-  shell.cd("./dynamic-app");
-  shell.exec(`npm version patch --no-git-tag-version`);
-};
+
 
 export const checkTriggerAction = () => {
   //pull new cds
