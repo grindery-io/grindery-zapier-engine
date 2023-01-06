@@ -97,7 +97,7 @@ app.post("/githubUpdate", async (req, res) => {
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
 app.post("/runPull", async (req, res) => {
-  let reporsitory = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+  let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
   let path = `./dynamic-app`
   console.log("root folder")
   shell.exec(`dir .`)
