@@ -96,7 +96,22 @@ app.post("/githubUpdate", async (req, res) => {
  
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
-
+app.post("/runPull", async (req, res) => {
+  let reporsitory = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+  let path = `./dynamic-app`
+  console.log("root folder")
+  shell.exec(`dir .`)
+  shell.cd(path) //inside dynamic
+  shell.exec(`git init `)
+  shell.exec(`git pull ${repository}`)
+  console.log(path)
+  shell.exec(`npm i`)
+  console.log("after install")
+  shell.exec(`dir .`)
+  shell.cd("..") //back to index
+  console.log("back to root folder")
+  shell.exec(`dir .`)
+})
 
 const pullDynamic = repository =>{
   
@@ -110,7 +125,7 @@ const pullDynamic = repository =>{
     shell.exec(`npm i`)
     console.log("after install")
     shell.exec(`dir .`)
-    shell.exec("cd ..") //back to index
+    shell.cd("..") //back to index
     console.log("back to root folder")
     shell.exec(`dir .`)
 }
