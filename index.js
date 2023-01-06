@@ -3,7 +3,7 @@ import shell from "shelljs"; //for using the shell terminal
 import bp from "body-parser";
 import fs from "fs";
 
-import { updateVersion, keyNames } from "./src/updateIndex.js";
+import { keyNames } from "./src/updateIndex.js";
 
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
@@ -115,28 +115,35 @@ app.post("/runPull", async (req, res) => {
 
 const pullDynamic = repository =>{
   
-    let path = `./dynamic-app`
-    console.log("root folder")
-    shell.exec(`dir .`)
-    shell.cd(path) //inside dynamic
-    shell.exec(`git init `)
-    shell.exec(`git pull ${repository}`)
-    console.log(path)
-    shell.exec(`npm i`)
-    console.log("after install")
-    shell.exec(`dir .`)
-    shell.cd("..") //back to index
-    console.log("back to root folder")
-    shell.exec(`dir .`)
+  let path = `./dynamic-app`
+  //console.log("root folder")
+  //shell.exec(`dir .`)
+  shell.cd(path) //inside dynamic
+  shell.exec(`git init `)
+  shell.exec(`git pull ${repository}`)
+  //console.log(path)
+  shell.exec(`npm i`)
+  //console.log("after install")
+  //shell.exec(`dir .`)
+  shell.cd("..") //back to index
+  //console.log("back to root folder")
+  //shell.exec(`dir .`)
 }
-// const pushDynamic = async(repository) => {
-//   shell.exec("dir .")
-//   //shell.cd("..")
-//   console.log("after")
-//   updateVersion(); //update version before pushing to zapier
-//   shell.exec("dir .")
-//   shell.exec(`npm run pushdynamic`);
-// };
+export const updateVersion = () => {
+  shell.cd("./dynamic-app");
+  shell.exec(`npm version patch --no-git-tag-version`);
+};
+const pushDynamic = async(repository) => {
+  console.log("root folder")
+  shell.exec("dir .")
+  //shell.cd("..")
+  console.log("after")
+  updateVersion(); //update version before pushing to zapier
+  shell.cd("..")
+  console.log("after update version")
+  shell.exec("dir .")
+  shell.exec(`npm run pushdynamic`);
+};
 
 app.post("/pushPokeApi", async (req, res) => {
   //parse payload from github webhook
