@@ -100,9 +100,8 @@ app.post("/githubUpdate", async (req, res) => {
 const pushDynamic = async(repository) => {
   //shell.cd(`git clone ${repository}`)
   let path = `./dynamic-app`;
+  shell.exec("dir .");
   shell.cd(path);
-  const files = shell.find(path)
-  console.log("files in dynamic-app", files)
   //shell.exec(`git init `);
   //shell.exec(`git pull ${repository}`);
   console.log("the shell path before npm i", path);
@@ -111,7 +110,7 @@ const pushDynamic = async(repository) => {
   //shell.exec(`zapier login`)
   path = `../`;
   updateVersion(); //update version before pushing to zapier
-  console.log("test shell: ", shell.test('-d', 'path'))  // dir
+  shell.exec("dir .");
   shell.cd(path);
   const index1 = shell.find(path)
   console.log("files in index dir", index1)
