@@ -156,6 +156,9 @@ const pushDynamic = async(repository) => {
   console.log("after")
   updateVersion(); //update version before pushing to zapier
   shell.cd("..")
+  shell.exec('git add .')
+  shell.exec(`git commit -m "some message"`)
+  shell.exec(`git push "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
   console.log("after update version")
   
 
