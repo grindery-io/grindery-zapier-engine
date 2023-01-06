@@ -70,8 +70,8 @@ app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
   //reporsitory = 
-  shell.cd(`git clone "https://github.com/connex-clientaccess/dynamic-app"`)
-  shell.cd(`git clone "https://github.com/grindery-io/grindery-nexus-schema-v2"`)
+  shell.exec(`git clone "https://github.com/connex-clientaccess/dynamic-app"`)
+  shell.exec(`git clone "https://github.com/grindery-io/grindery-nexus-schema-v2"`)
   //format key name files
   const added = keyNames(value.commits[0].added);
   if(added != undefined){
