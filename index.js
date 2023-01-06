@@ -117,7 +117,7 @@ app.post("/githubUpdate", async (req, res) => {
     
     // push to zapier
     await pushDynamic();
-    await sendNotification()
+    //await sendNotification()
     
     res.status(200).json({"res": "hello"})
   }else{
