@@ -121,7 +121,7 @@ app.post("/runPush", async (req, res) => {
   //shell.cd("..")
   console.log("after")
   updateVersion(); //update version before pushing to zapier
-  //shell.cd("..")
+  shell.cd("..")
   console.log("after update version")
   shell.exec("dir .")
   shell.exec(`npm run pushdynamic`);
