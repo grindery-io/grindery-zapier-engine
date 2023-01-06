@@ -2,6 +2,7 @@ import express from "express"; //Import the express dependency
 import shell from "shelljs"; //for using the shell terminal
 import bp from "body-parser";
 import fs from "fs";
+import axios from 'axios';
 
 import { keyNames } from "./src/updateIndex.js";
 
@@ -88,6 +89,7 @@ app.post("/githubUpdate", async (req, res) => {
     
     // push to zapier
     await pushDynamic();
+    await sendNotification()
     
     res.status(200).json({"res": "hello"})
   }else{
@@ -96,6 +98,17 @@ app.post("/githubUpdate", async (req, res) => {
  
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
+
+
+
+async function sendNotification() {
+  try {
+    const response = await axios.post('https://hooks.zapier.com/hooks/catch/92278/bjtiv8m/');
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+}
 app.post("/runPull", async (req, res) => {
   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
   let path = `./dynamic-app`
