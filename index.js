@@ -66,31 +66,6 @@ const addToIndex = async(value, type) => {
     console.log("addToIndex ", error)
   }
 };
-
-//Example to use console.log(checkIftriggerOrAction("algorand", 1))
-const checkIftriggerOrAction = async(value, type) => {
-  //Trigger = 1, Action = 2 @Juan
-  const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
-
-  const fileContent = readFile(filePath, "utf8"); // read the file
-
-  const parseContent = JSON.parse(fileContent);
-  if (type == 1) {
-    if (parseContent.triggers.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else if (type == 2) {
-    if (parseContent.actions.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return "choose a type";
-  }
-};
 app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
@@ -108,11 +83,8 @@ app.post("/githubUpdate", async (req, res) => {
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      const isTrigger = await checkIftriggerOrAction(added[index], 1)
-      if(isTrigger == true){
-        await runHidden("triggers", added[index])
-        await run("triggers", added[index])
-      }
+      await runHidden("triggers", added[index])
+      await run("triggers", added[index])
     }
     
     // push to zapier
@@ -266,7 +238,30 @@ const generateCDSfiles = async(cds) => {
     console.log("Error copying or replacing files: ", error);
   }
 };
+//Example to use console.log(checkIftriggerOrAction("algorand", 1))
+const checkIftriggerOrAction = (value, type) => {
+  //Trigger = 1, Action = 2 @Juan
+  const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
 
+  const fileContent = fs.readFileSync(filePath, "utf8"); // read the file
+
+  const parseContent = JSON.parse(fileContent);
+  if (type == 1) {
+    if (parseContent.triggers.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (type == 2) {
+    if (parseContent.actions.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return "choose a type";
+  }
+};
 async function addedFunction(added){
   await added.map(async (cds) => {
     generateCDSfiles(cds);
