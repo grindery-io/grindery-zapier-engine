@@ -35,13 +35,13 @@ const creatorID = async (z, bundle) => {
     //force token refresh if invalid
     if (error.message === "Invalid access token") {
       z.console.log(
-        "Auth Error in creatorID function (trigger_from_a_grindery_workflow.js)",
+        "Auth Error in creatorID function (replaceTrigger.js)",
         error.message
       );
       throw new z.errors.RefreshAuthError();
     } else {
       z.console.log(
-        "Error in creatorID function (trigger_from_a_grindery_workflow.js)",
+        "Error in creatorID function (replaceTrigger.js)",
         error.message
       );
     }
@@ -50,10 +50,8 @@ const creatorID = async (z, bundle) => {
 
 // triggers on a new trigger_from_a_grindery_workflow with a certain tag
 const perform = async (z, bundle) => {
-  const payload = {
-    data: bundle.cleanedRequest.data,
-  };
-  return [payload];
+  
+  return [bundle.cleanedRequest.data];
 };
 
 //This method retrieves sample documents from Grindery Drivers via REST API
