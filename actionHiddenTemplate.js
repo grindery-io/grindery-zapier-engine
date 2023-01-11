@@ -36,7 +36,7 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#triggerschema
-  key: "replaceAction",
+  key: "replaceAction_action_hidden",
   noun: "replaceAction Actions",
 
   display: {
