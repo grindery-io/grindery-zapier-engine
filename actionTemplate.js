@@ -1,7 +1,7 @@
 const NexusClient = require("grindery-nexus-client").default;
 
 const driver_id = "replaceAction";
-const replaceAction_action_hidden = require("./replaceAction_action_hidden");
+const replaceAction_action_hidden = require("../triggers/replaceAction_action_hidden");
 
 // create a particular run_grindery_action by name
 const perform = async (z, bundle) => {
