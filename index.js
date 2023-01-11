@@ -120,6 +120,15 @@ const addToIndex = async (value, type) => {
     console.log("addToIndex ", error);
   }
 };
+async function loop(added){
+  for (let index = 0; index < added.length; index++) {
+    await runHidden("triggers", added[index]);
+    await runHidden("creates", added[index]);
+    await run("triggers", added[index]);
+    await run("creates", added[index]);
+  }
+  return 
+}
 app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
@@ -139,14 +148,8 @@ app.post("/githubUpdate", async (req, res) => {
 
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
-    for (let index = 0; index < added.length; index++) {
-      const element = added[index];
-      await runHidden("triggers", added[index]);
-      await runHidden("creates", added[index]);
-      await run("triggers", added[index]);
-      await run("creates", added[index]);
-    }
-
+    
+    await loop(added)
     // push to zapier
     await pushDynamic();
     await sendNotification();
