@@ -100,7 +100,7 @@ app.post("/githubUpdate", async (req, res) => {
   //reporsitory = 
   //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
  
-  shell.exec(`git pull "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
+  shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
   pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
   //format key name files
   const added = keyNames(value.commits[0].added);
@@ -111,19 +111,10 @@ app.post("/githubUpdate", async (req, res) => {
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      const trigger = await checkIftriggerOrAction(element, 1)
-      const action = await checkIftriggerOrAction(element, 2)
-      if(trigger){
-        
-        await runHidden("triggers", element)
-        await run("triggers", element)
-      }
-      if(action){ //TO-DO
-        //await runHidden("actions", added[index])
-        //await run("actions", added[index])
-      }
-      
+      await runHidden("triggers", added[index])
+      await run("triggers", added[index])
     }
+    
     // push to zapier
     await pushDynamic();
     await sendNotification()
@@ -133,17 +124,18 @@ app.post("/githubUpdate", async (req, res) => {
     res.status(400).json({"res": "request again", "payload": value})
   }
  
+ 
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
 
 app.post("/getUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
-  //reporsitory = 
-  //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
- 
+  shell.cd("./grindery-nexus-schema-v2")
   shell.exec(`git pull "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
+  shell.cd("..")
   pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
+
   //format key name files
   const added = keyNames(value.commits[0].added);
   if(added != undefined){
