@@ -2,11 +2,10 @@ import express from "express"; //Import the express dependency
 import shell from "shelljs"; //for using the shell terminal
 import bp from "body-parser";
 import fs from "fs"; //write read files
-import axios from 'axios'; //call endpoint
-import util from 'util' //use promises for fs library
+import axios from "axios"; //call endpoint
+import util from "util"; //use promises for fs library
 
 import { keyNames, getBranch } from "./src/Utilities.js";
-
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
 
@@ -15,44 +14,58 @@ const app = express(); //Instantiate an express app, the main work horse of this
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
-
 // Convert fs.readFile to return a promise
 const readFile = util.promisify(fs.readFile);
 
 // Convert fs.writeFile to return a promise
 const writeFile = util.promisify(fs.writeFile);
 
-async function runHidden(type, generatedTrigger) {
+async function runHidden(type, cds) {
   try {
-    const filePath = `./dynamic-app/${type}/${[generatedTrigger]}_hidden.js`;
-    const data = await readFile('triggerHiddenTemplate.js', 'utf8');
-    const modified = data.replace(/replaceTrigger/g, generatedTrigger);
-    await writeFile(filePath, modified, 'utf8');
+    const data = {};
+    const modified = {};
+    const filePath = `./dynamic-app/${type}/${[cds]}_hidden.js`;
+    if (type === "triggers") {
+      data = await readFile("triggerHiddenTemplate.js", "utf8");
+      modified = data.replace(/replaceTrigger/g, cds);
+    } else {
+      data = await readFile("actionHiddenTemplate.js", "utf8");
+      modified = data.replace(/replaceAction/g, cds);
+    }
+
+    await writeFile(filePath, modified, "utf8");
   } catch (error) {
     console.log("runHidden ", error);
   }
 }
 
-async function run(type, generatedTrigger) {
+async function run(type, cds) {
   try {
-    const filePath = `./dynamic-app/${type}/${[generatedTrigger]}.js`;
-    const data = await readFile('triggerTemplate.js', 'utf8');
-    const modified = data.replace(/replaceTrigger/g, generatedTrigger);
-  
-    await writeFile(filePath, modified, 'utf8');
-    await addToIndex(generatedTrigger, type)
+    const data = {};
+    const modified = {};
+    const filePath = `./dynamic-app/${type}/${[cds]}.js`;
+    if (type === "triggers") {
+      data = await readFile("triggerTemplate.js", "utf8");
+      modified = data.replace(/replaceTrigger/g, cds);
+    } else {
+      data = await readFile("actionTemplate.js", "utf8");
+      modified = data.replace(/replaceAction/g, cds);
+    }
+
+    await writeFile(filePath, modified, "utf8");
+    await addToIndex(generatedTrigger, type);
   } catch (error) {
     console.log("run ", error);
   }
 }
-async function checkIftriggerOrAction(value, type){
+async function checkIftriggerOrAction(value, type) {
   try {
     //Trigger = 1, Action = 2 @Juan
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
-    console.log("before")
+    console.log("before");
     const fileContent = await readFile(filePath, "utf8"); // read the file
-    console.log(fileContent)
-    console.log("after")
+    console.log(fileContent);
+    console.log("after");
     const parseContent = JSON.parse(fileContent);
     if (type == 1) {
       if (parseContent.triggers.length > 0) {
@@ -72,157 +85,166 @@ async function checkIftriggerOrAction(value, type){
   } catch (error) {
     console.log("checkIftriggerOrAction ", error);
   }
-};
+}
 
-
-const addToIndex = async(value, type) => {
-  let counter = 18
+const addToIndex = async (value, type) => {
+  let counter = 18;
   // Read the contents of the file
   try {
-    const readRes = await readFile("./dynamic-app/index.js", "utf8")
-    console.log(readRes)
+    const readRes = await readFile("./dynamic-app/index.js", "utf8");
+    console.log(readRes);
     const lines = readRes.split("\n");
     const added = `const ` + value + ` = require("./${type}/` + value + `")`;
     lines.splice(counter, 0, added); // Insert the new line at the specified index
-    console.log(lines[counter])
-    counter = counter - 1
+    console.log(lines[counter]);
+    counter = counter - 1;
     // Join the lines back together and write the modified contents back to the file
-    const res = await writeFile("./dynamic-app/index.js", lines.join("\n"), "utf8")
-    return res
-    
+    const res = await writeFile(
+      "./dynamic-app/index.js",
+      lines.join("\n"),
+      "utf8"
+    );
+    return res;
   } catch (error) {
-    console.log("addToIndex ", error)
+    console.log("addToIndex ", error);
   }
 };
 app.post("/githubUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
-  //reporsitory = 
+  //reporsitory =
   //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
- 
-  shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
-  pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
+
+  shell.exec(
+    `git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`
+  );
+  pullDynamic(
+    "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+  );
   //format key name files
   const added = keyNames(value.commits[0].added);
-  if(added != undefined){
+  if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
-    
+
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      await runHidden("triggers", added[index])
-      await run("triggers", added[index])
+      await runHidden("triggers", added[index]);
+      await run("triggers", added[index]);
     }
-    
+
     // push to zapier
     await pushDynamic();
-    await sendNotification()
-    
-    res.status(200).json({"res": "hello"})
-  }else{
-    res.status(400).json({"res": "request again", "payload": value})
+    await sendNotification();
+
+    res.status(200).json({ res: "hello" });
+  } else {
+    res.status(400).json({ res: "request again", payload: value });
   }
- 
- 
+
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
-})
+});
 
 app.post("/getUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
-  pullSchema("https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2")
-  pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
+  pullSchema(
+    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
+  );
+  pullDynamic(
+    "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+  );
 
   //format key name files
   const added = keyNames(value.commits[0].added);
   const removed = keyNames(value.commits[0].removed);
-  const branch = getBranch(value.ref)
-  if(added != undefined){
+  const branch = getBranch(value.ref);
+  if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
-    
+
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      const trigger = await checkIftriggerOrAction(element, 1)
-      const action = await checkIftriggerOrAction(element, 2)
-      if(trigger){
-        
-        await runHidden("triggers", element)
-        await run("triggers", element)
+      const trigger = await checkIftriggerOrAction(element, 1);
+      const action = await checkIftriggerOrAction(element, 2);
+      if (trigger) {
+        await runHidden("triggers", element);
+        await run("triggers", element);
       }
-      if(action){ //TO-DO
-        //await runHidden("actions", added[index])
-        //await run("actions", added[index])
+      if (action) {
+        //TO-DO
+        await runHidden("creates", added[index]);
+        await run("creates", added[index]);
       }
-      
     }
     // push to zapier
     await pushDynamic();
     //await sendNotification()
-    
-    res.status(200).json({"res": "hello"})
-  }else{
-    res.status(400).json({"res": "request again", "payload": value})
-  }
- 
-  //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
-})
 
+    res.status(200).json({ res: "hello" });
+  } else {
+    res.status(400).json({ res: "request again", payload: value });
+  }
+
+  //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
+});
 
 async function sendNotification() {
   try {
-    const response = await axios.post('https://hooks.zapier.com/hooks/catch/92278/bjtiv8m/');
+    const response = await axios.post(
+      "https://hooks.zapier.com/hooks/catch/92278/bjtiv8m/"
+    );
     console.log(response.data);
   } catch (error) {
     console.error(error);
   }
 }
 
-const pullDynamic = repository =>{
-  
-  let path = `./dynamic-app`
+const pullDynamic = (repository) => {
+  let path = `./dynamic-app`;
   //console.log("root folder")
   //shell.exec(`dir .`)
-  shell.cd(path) //inside dynamic
-  shell.exec(`git init `)
-  shell.exec(`git pull ${repository}`)
+  shell.cd(path); //inside dynamic
+  shell.exec(`git init `);
+  shell.exec(`git pull ${repository}`);
   //console.log(path)
-  shell.exec(`npm i`)
+  shell.exec(`npm i`);
   //console.log("after install")
   //shell.exec(`dir .`)
-  shell.cd("..") //back to index
+  shell.cd(".."); //back to index
   //console.log("back to root folder")
   //shell.exec(`dir .`)
-}
-const pullSchema = repository =>{
-  
-  shell.cd("./grindery-nexus-schema-v2")
-  shell.exec("git init")
-  shell.exec(`git pull ${repository}`)
-  shell.cd("..")
-}
+};
+const pullSchema = (repository) => {
+  shell.cd("./grindery-nexus-schema-v2");
+  shell.exec("git init");
+  shell.exec(`git pull ${repository}`);
+  shell.cd("..");
+};
 
 const updateVersion = () => {
   shell.cd("./dynamic-app");
   shell.exec(`npm version patch --no-git-tag-version`);
 };
-const pushDynamic = async(repository) => {
-  console.log("root folder")
-  shell.exec("dir .")
+const pushDynamic = async (repository) => {
+  console.log("root folder");
+  shell.exec("dir .");
   //shell.cd("..")
-  console.log("after")
+  console.log("after");
   updateVersion(); //update version before pushing to zapier
-  
-  shell.exec('git init')
-  shell.exec(`git config user.email clientaccess@connex.digital`)
-  shell.exec(`git config user.name connex-clientaccess`)
-  shell.exec('git add .')
-  shell.exec(`git commit -m "some message"`)
-  shell.exec(`git push "https://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@github.com/connex-clientaccess/dynamic-app"`)
-  console.log("after update version")
-  shell.cd("..")
+
+  shell.exec("git init");
+  shell.exec(`git config user.email clientaccess@connex.digital`);
+  shell.exec(`git config user.name connex-clientaccess`);
+  shell.exec("git add .");
+  shell.exec(`git commit -m "some message"`);
+  shell.exec(
+    `git push "https://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@github.com/connex-clientaccess/dynamic-app"`
+  );
+  console.log("after update version");
+  shell.cd("..");
 
   //shell.exec('npm run pushdynamicLink')
   shell.exec(`npm run pushdynamic`);
@@ -251,7 +273,7 @@ app.listen(PORT, () => {
 // })
 
 // app.post("/runPush", async (req, res) => {
-  
+
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
 //   pullDynamic(repository)
 //   console.log("root folder")
@@ -278,17 +300,14 @@ app.listen(PORT, () => {
 //   console.log("the shell path before npm i", path);
 //   shell.exec(`npm i`);
 //   path = `../`;
-  
- 
+
 //   shell.cd(path);
 //   console.log("excute")
 //   shell.exec("rm -rf node_modules")
 //   shell.exec("npm i")
-  
+
 //   shell.exec(`npm run pushtozapier`);
 // })
-
-
 
 //   //TODO - perform loop for deleted cds files
 //   async function runHidden(type, generatedTrigger){
@@ -299,10 +318,10 @@ app.listen(PORT, () => {
 //           if (err) {
 //             return console.log(err);
 //           }
-      
+
 //           // Replace all occurrences of the word "replace" with "foo"
 //           const modified = data.replace(/replaceTrigger/g, generatedTrigger);
-      
+
 //           // Write the modified content back to the file
 //           const res = fs.writeFile(filePath, modified, 'utf8', (error) => {
 //             if (error) {
@@ -310,7 +329,7 @@ app.listen(PORT, () => {
 //             }
 //             console.log(`Successfully replaced all occurrences of "replaceTrigge" with ${generatedTrigger} in the file`);
 //           });
-          
+
 //           return res;
 //         });
 
@@ -327,10 +346,10 @@ app.listen(PORT, () => {
 //           if (err) {
 //             return console.log(err);
 //           }
-      
+
 //           // Replace all occurrences of the word "replace" with "foo"
 //           const modified = data.replace(/replaceTrigger/g, generatedTrigger);
-      
+
 //           // Write the modified content back to the file
 //           const res = fs.writeFile(filePath, modified, 'utf8', (error) => {
 //             if (error) {
@@ -338,7 +357,7 @@ app.listen(PORT, () => {
 //             }
 //             console.log(`Successfully replaced all occurrences of "replaceTrigge" with ${generatedTrigger} in the file`);
 //           });
-          
+
 //           return res;
 //         });
 
@@ -347,9 +366,7 @@ app.listen(PORT, () => {
 //        console.log(error)
 //     }
 // }
-  //const res = addToIndex(obj.added)
-  
-
+//const res = addToIndex(obj.added)
 
 // function run(){
 //   //test
@@ -367,8 +384,6 @@ app.listen(PORT, () => {
 //   // }
 // }
 // run()
-
-
 
 // const jsonData = "hello world"
 // app.get('/updateCDS', (req, res)=>{
