@@ -32,7 +32,7 @@ async function runHidden(type, cds) {
     } else {
       data = await readFile("actionHiddenTemplate.js", "utf8");
       modified = data.replace(/replaceAction/g, cds);
-      filePath = `./dynamic-app/${type}/${[cds]}_action_hidden.js`;
+      filePath = `./dynamic-app/triggers/${[cds]}_action_hidden.js`;
     }
 
     await writeFile(filePath, modified, "utf8");
@@ -101,7 +101,7 @@ const addToIndex = async (value, type) => {
       line_to_add = `const ` + value + ` = require("./${type}/` + value + `")`;
     } else {
       line_to_add =
-        `const ` + value + ` = require("./${type}/` + value + `_action` + `")`;
+        `const ` + value + `_action` + ` = require("./${type}/` + value + `")`;
     }
     const added = line_to_add;
     lines.splice(counter, 0, added); // Insert the new line at the specified index
