@@ -51,7 +51,7 @@ const creatorID = async (z, bundle) => {
 // triggers on a new trigger_from_a_grindery_workflow with a certain tag
 const perform = async (z, bundle) => {
   
-  return [bundle.cleanedRequest.data];
+  return [bundle.cleanedRequest];
 };
 
 //This method retrieves sample documents from Grindery Drivers via REST API
