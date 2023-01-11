@@ -5,7 +5,7 @@ import fs from "fs"; //write read files
 import axios from 'axios'; //call endpoint
 import util from 'util' //use promises for fs library
 
-import { keyNames } from "./src/Utilities.js";
+import { keyNames, getBranch } from "./src/Utilities.js";
 
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
@@ -131,14 +131,13 @@ app.post("/githubUpdate", async (req, res) => {
 app.post("/getUpdate", async (req, res) => {
   //parse payload from github webhook
   const value = JSON.parse(req.body.payload);
-  shell.cd("./grindery-nexus-schema-v2")
-  shell.exec("git init")
-  shell.exec(`git pull "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
-  shell.cd("..")
+  pullSchema("https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2")
   pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
 
   //format key name files
   const added = keyNames(value.commits[0].added);
+  const removed = keyNames(value.commits[0].removed);
+  const branch = getBranch(value.ref)
   if(added != undefined){
     //const added= ["erc20", "erc721", "gnosisSafe"]
     
@@ -197,6 +196,14 @@ const pullDynamic = repository =>{
   //console.log("back to root folder")
   //shell.exec(`dir .`)
 }
+const pullSchema = repository =>{
+  
+  shell.cd("./grindery-nexus-schema-v2")
+  shell.exec("git init")
+  shell.exec(`git pull ${repository}`)
+  shell.cd("..")
+}
+
 const updateVersion = () => {
   shell.cd("./dynamic-app");
   shell.exec(`npm version patch --no-git-tag-version`);

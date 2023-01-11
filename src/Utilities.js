@@ -17,3 +17,7 @@ export const keyNames =(value) =>{
   return output
 } 
 
+export const getBranch = (ref)=>{
+    const value = ref.split("/")
+    console.log(value[value.length - 1])
+}
