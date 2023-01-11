@@ -34,7 +34,7 @@ async function runHidden(type, cds) {
       modified = data.replace(/replaceAction/g, cds);
       filePath = `./dynamic-app/triggers/${[cds]}_action_hidden.js`;
     }
-
+    console.log("run hidden function", value)
     await writeFile(filePath, modified, "utf8");
   } catch (error) {
     console.log("runHidden ", error);
@@ -53,7 +53,7 @@ async function run(type, cds) {
       data = await readFile("actionTemplate.js", "utf8");
       modified = data.replace(/replaceAction/g, cds);
     }
-
+    console.log("run function ", value)
     await writeFile(filePath, modified, "utf8");
     await addToIndex(cds, type);
   } catch (error) {
@@ -99,9 +99,11 @@ const addToIndex = async (value, type) => {
     const line_to_add = ``;
     if (type === "triggers") {
       line_to_add = `const ` + value + ` = require("./${type}/` + value + `")`;
+      console.log("this is a trigger ", value)
     } else {
       line_to_add =
         `const ` + value + `_action` + ` = require("./${type}/` + value + `")`;
+      console.log("this is a action ", value)
     }
     const added = line_to_add;
     lines.splice(counter, 0, added); // Insert the new line at the specified index
