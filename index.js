@@ -93,8 +93,8 @@ const addToIndex = async (value, type) => {
   try {
     const readRes = await readFile("./dynamic-app/index.js", "utf8");
     console.log(readRes);
-    const lines = readRes.split("\n");
-    const line_to_add = ``;
+    let lines = readRes.split("\n");
+    let line_to_add = ``;
     if (type === "triggers") {
       line_to_add = `const ` + value + ` = require("./${type}/` + value + `")`;
       console.log("this is a trigger ", value)
