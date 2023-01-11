@@ -45,6 +45,34 @@ async function run(type, generatedTrigger) {
     console.log("run ", error);
   }
 }
+async function checkIftriggerOrAction(value, type){
+  try {
+    //Trigger = 1, Action = 2 @Juan
+    const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
+    console.log("before")
+    const fileContent = await readFile(filePath, "utf8"); // read the file
+    console.log(fileContent)
+    console.log("after")
+    const parseContent = JSON.parse(fileContent);
+    if (type == 1) {
+      if (parseContent.triggers.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (type == 2) {
+      if (parseContent.actions.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return "choose a type";
+    }
+  } catch (error) {
+    console.log("checkIftriggerOrAction ", error);
+  }
+};
 
 
 const addToIndex = async(value, type) => {
@@ -190,31 +218,6 @@ const pushDynamic = async(repository) => {
 
   //shell.exec('npm run pushdynamicLink')
   shell.exec(`npm run pushdynamic`);
-};
-
-//Example to use console.log(checkIftriggerOrAction("algorand", 1))
-const checkIftriggerOrAction = (value, type) => {
-  //Trigger = 1, Action = 2 @Juan
-  const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
-
-  const fileContent = fs.readFileSync(filePath, "utf8"); // read the file
-
-  const parseContent = JSON.parse(fileContent);
-  if (type == 1) {
-    if (parseContent.triggers.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else if (type == 2) {
-    if (parseContent.actions.length > 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return "choose a type";
-  }
 };
 
 app.listen(PORT, () => {
