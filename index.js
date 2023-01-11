@@ -34,7 +34,6 @@ async function runHidden(type, cds) {
       modified = data.replace(/replaceAction/g, cds);
       filePath = `./dynamic-app/triggers/${[cds]}_action_hidden.js`;
     }
-    console.log("run hidden function", value)
     await writeFile(filePath, modified, "utf8");
   } catch (error) {
     console.log("runHidden ", error);
@@ -53,7 +52,6 @@ async function run(type, cds) {
       data = await readFile("actionTemplate.js", "utf8");
       modified = data.replace(/replaceAction/g, cds);
     }
-    console.log("run function ", value)
     await writeFile(filePath, modified, "utf8");
     await addToIndex(cds, type);
   } catch (error) {
