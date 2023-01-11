@@ -1,10 +1,11 @@
 import express from "express"; //Import the express dependency
 import shell from "shelljs"; //for using the shell terminal
 import bp from "body-parser";
-import fs from "fs";
-import axios from 'axios';
+import fs from "fs"; //write read files
+import axios from 'axios'; //call endpoint
+import util from 'util' //use promises for fs library
 
-import { keyNames } from "./src/updateIndex.js";
+import { keyNames } from "./src/Utilities.js";
 
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
@@ -14,8 +15,6 @@ const app = express(); //Instantiate an express app, the main work horse of this
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
-
-import util from 'util'
 
 // Convert fs.readFile to return a promise
 const readFile = util.promisify(fs.readFile);
@@ -46,6 +45,35 @@ async function run(type, generatedTrigger) {
     console.log("run ", error);
   }
 }
+async function checkIftriggerOrAction(value, type){
+  try {
+    //Trigger = 1, Action = 2 @Juan
+    const filePath = `./grindery-nexus-schema-v2/cds/web3/${value}.json`;
+    console.log("before")
+    const fileContent = await readFile(filePath, "utf8"); // read the file
+    console.log(fileContent)
+    console.log("after")
+    const parseContent = JSON.parse(fileContent);
+    if (type == 1) {
+      if (parseContent.triggers.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (type == 2) {
+      if (parseContent.actions.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return "choose a type";
+    }
+  } catch (error) {
+    console.log("checkIftriggerOrAction ", error);
+  }
+};
+
 
 const addToIndex = async(value, type) => {
   let counter = 18
@@ -72,7 +100,7 @@ app.post("/githubUpdate", async (req, res) => {
   //reporsitory = 
   //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
  
-  shell.exec(`git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
+  shell.exec(`git pull "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`)
   pullDynamic("https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app")
   //format key name files
   const added = keyNames(value.commits[0].added);
@@ -83,10 +111,19 @@ app.post("/githubUpdate", async (req, res) => {
     // console.log(removed);
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
-      await runHidden("triggers", added[index])
-      await run("triggers", added[index])
+      const trigger = await checkIftriggerOrAction(element, 1)
+      const action = await checkIftriggerOrAction(element, 2)
+      if(trigger){
+        
+        await runHidden("triggers", element)
+        await run("triggers", element)
+      }
+      if(action){ //TO-DO
+        //await runHidden("actions", added[index])
+        //await run("actions", added[index])
+      }
+      
     }
-    
     // push to zapier
     await pushDynamic();
     await sendNotification()
@@ -99,8 +136,6 @@ app.post("/githubUpdate", async (req, res) => {
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 })
 
-
-
 async function sendNotification() {
   try {
     const response = await axios.post('https://hooks.zapier.com/hooks/catch/92278/bjtiv8m/');
@@ -109,39 +144,6 @@ async function sendNotification() {
     console.error(error);
   }
 }
-app.post("/runPull", async (req, res) => {
-  let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
-  let path = `./dynamic-app`
-  console.log("root folder")
-  shell.exec(`dir .`)
-  shell.cd(path) //inside dynamic
-  shell.exec(`git init `)
-
-  shell.exec(`git pull ${repository}`)
-  console.log(path)
-  shell.exec(`npm i`)
-  console.log("after install")
-  shell.exec(`dir .`)
-  shell.cd("..") //back to index
-  console.log("back to root folder")
-  shell.exec(`dir .`)
-})
-// app.post("/runPush", async (req, res) => {
-  
-//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
-//   pullDynamic(repository)
-//   console.log("root folder")
-//   shell.exec("dir .")
-//   //shell.cd("..")
-//   console.log("after")
-//   updateVersion(); //update version before pushing to zapier
-//   shell.cd("..")
-//   console.log("after update version")
-//   shell.exec("dir .")
-
-//   //shell.exec('npm run pushdynamicLink')
-//   shell.exec(`npm run pushdynamic`);
-// })
 
 const pullDynamic = repository =>{
   
@@ -159,7 +161,7 @@ const pullDynamic = repository =>{
   //console.log("back to root folder")
   //shell.exec(`dir .`)
 }
-export const updateVersion = () => {
+const updateVersion = () => {
   shell.cd("./dynamic-app");
   shell.exec(`npm version patch --no-git-tag-version`);
 };
@@ -183,61 +185,6 @@ const pushDynamic = async(repository) => {
   shell.exec(`npm run pushdynamic`);
 };
 
-// app.post("/pushPokeApi", async (req, res) => {
-//   //parse payload from github webhook
-//   shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/PokeApi"`)
-//   let path = `./PokeApi`;
-//   shell.exec("dir .");
-//   shell.cd(path);
-//   //shell.exec(`git init `);
-//   //shell.exec(`git pull ${repository}`);
-//   console.log("the shell path before npm i", path);
-//   shell.exec(`npm i`);
-//   path = `../`;
-  
- 
-//   shell.cd(path);
-//   console.log("excute")
-//   shell.exec("rm -rf node_modules")
-//   shell.exec("npm i")
-  
-//   shell.exec(`npm run pushtozapier`);
-// })
-
-
-
-const generateCDSfiles = async(cds) => {
-  try {
-    //test if trigger
-    let trigger_result = checkIftriggerOrAction(cds, 1);
-    if (trigger_result) {
-      let type = "triggers";
-      let generatedTrigger = cds
-
-      await fs.copyFileSync(
-        `triggerTemplate.js`,
-        `./dynamic-app/${type}/${[generatedTrigger]}.js`
-      );
-
-      await fs.copyFileSync(
-        `triggerHiddenTemplate.js`,
-        `./dynamic-app/${type}/${[generatedTrigger]}_hidden.js`
-      );
-      await replaceInFile(`./dynamic-app/${type}/${[generatedTrigger]}_hidden.js`, generatedTrigger)
-      await replaceInFile(`./dynamic-app/${type}/${[generatedTrigger]}.js`, generatedTrigger)
-      console.log("replace in file ", generatedTrigger)
-      await addToIndex(generatedTrigger, type);
-      console.log("add to index ", generatedTrigger)
-      
-      
-    }
-    return 1
-
-    //test if action
-  } catch (error) {
-    console.log("Error copying or replacing files: ", error);
-  }
-};
 //Example to use console.log(checkIftriggerOrAction("algorand", 1))
 const checkIftriggerOrAction = (value, type) => {
   //Trigger = 1, Action = 2 @Juan
@@ -262,12 +209,68 @@ const checkIftriggerOrAction = (value, type) => {
     return "choose a type";
   }
 };
-async function addedFunction(added){
-  await added.map(async (cds) => {
-    generateCDSfiles(cds);
-  })
-  return 123
-}
+
+app.listen(PORT, () => {
+  //server starts listening for any attempts from a client to connect at port: {port}
+  console.log(`Now listening on port ${PORT}`);
+});
+// app.post("/runPull", async (req, res) => {
+//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+//   let path = `./dynamic-app`
+//   console.log("root folder")
+//   shell.exec(`dir .`)
+//   shell.cd(path) //inside dynamic
+//   shell.exec(`git init `)
+
+//   shell.exec(`git pull ${repository}`)
+//   console.log(path)
+//   shell.exec(`npm i`)
+//   console.log("after install")
+//   shell.exec(`dir .`)
+//   shell.cd("..") //back to index
+//   console.log("back to root folder")
+//   shell.exec(`dir .`)
+// })
+
+// app.post("/runPush", async (req, res) => {
+  
+//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+//   pullDynamic(repository)
+//   console.log("root folder")
+//   shell.exec("dir .")
+//   //shell.cd("..")
+//   console.log("after")
+//   updateVersion(); //update version before pushing to zapier
+//   shell.cd("..")
+//   console.log("after update version")
+//   shell.exec("dir .")
+
+//   //shell.exec('npm run pushdynamicLink')
+//   shell.exec(`npm run pushdynamic`);
+// })
+
+// app.post("/pushPokeApi", async (req, res) => {
+//   //parse payload from github webhook
+//   shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/PokeApi"`)
+//   let path = `./PokeApi`;
+//   shell.exec("dir .");
+//   shell.cd(path);
+//   //shell.exec(`git init `);
+//   //shell.exec(`git pull ${repository}`);
+//   console.log("the shell path before npm i", path);
+//   shell.exec(`npm i`);
+//   path = `../`;
+  
+ 
+//   shell.cd(path);
+//   console.log("excute")
+//   shell.exec("rm -rf node_modules")
+//   shell.exec("npm i")
+  
+//   shell.exec(`npm run pushtozapier`);
+// })
+
+
 
 //   //TODO - perform loop for deleted cds files
 //   async function runHidden(type, generatedTrigger){
@@ -329,10 +332,7 @@ async function addedFunction(added){
   //const res = addToIndex(obj.added)
   
 
-app.listen(PORT, () => {
-  //server starts listening for any attempts from a client to connect at port: {port}
-  console.log(`Now listening on port ${PORT}`);
-});
+
 // function run(){
 //   //test
 //   let obj = {
