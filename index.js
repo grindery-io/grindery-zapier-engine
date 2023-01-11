@@ -140,7 +140,9 @@ app.post("/githubUpdate", async (req, res) => {
     for (let index = 0; index < added.length; index++) {
       const element = added[index];
       await runHidden("triggers", added[index]);
+      await runHidden("creates", added[index]);
       await run("triggers", added[index]);
+      await run("creates", added[index]);
     }
 
     // push to zapier
