@@ -22,9 +22,9 @@ const writeFile = util.promisify(fs.writeFile);
 
 async function runHidden(type, cds) {
   try {
-    const data = {};
-    const modified = {};
-    const filePath = ``;
+    let data = {};
+    let modified = {};
+    let filePath = ``;
     if (type === "triggers") {
       data = await readFile("triggerHiddenTemplate.js", "utf8");
       modified = data.replace(/replaceTrigger/g, cds);
@@ -43,9 +43,9 @@ async function runHidden(type, cds) {
 
 async function run(type, cds) {
   try {
-    const data = {};
-    const modified = {};
-    const filePath = `./dynamic-app/${type}/${[cds]}.js`;
+    let data = {};
+    let modified = {};
+    let filePath = `./dynamic-app/${type}/${[cds]}.js`;
     if (type === "triggers") {
       data = await readFile("triggerTemplate.js", "utf8");
       modified = data.replace(/replaceTrigger/g, cds);
