@@ -1,7 +1,7 @@
 const NexusClient = require("grindery-nexus-client").default;
 
 const driver_id = "replaceAction";
-const replaceTrigger_hidden = require("./replaceAction_hidden");
+const replaceTrigger_action_hidden = require("./replaceAction_action_hidden");
 
 // create a particular run_grindery_action by name
 const perform = async (z, bundle) => {
@@ -71,12 +71,12 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#createschema
-  key: "run_grindery_action",
-  noun: "Grindery Gateway",
+  key: "replaceAction",
+  noun: "replaceAction",
 
   display: {
-    label: "Grindery Gateway",
-    description: "Configure actions using Grindery Gateway directly in Zapier",
+    label: "replaceAction Actions",
+    description: "Configure actions using erc20 directly in Zapier",
   },
 
   operation: {
@@ -92,7 +92,7 @@ module.exports = {
         type: "string",
         required: true,
         altersDynamicFields: true,
-        dynamic: "replaceAction_hidden.key",
+        dynamic: "replaceAction_action_hidden.key",
       },
       async function (z, bundle) {
         const client = new NexusClient();

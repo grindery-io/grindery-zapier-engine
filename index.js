@@ -24,13 +24,15 @@ async function runHidden(type, cds) {
   try {
     const data = {};
     const modified = {};
-    const filePath = `./dynamic-app/${type}/${[cds]}_hidden.js`;
+    const filePath = ``;
     if (type === "triggers") {
       data = await readFile("triggerHiddenTemplate.js", "utf8");
       modified = data.replace(/replaceTrigger/g, cds);
+      filePath = `./dynamic-app/${type}/${[cds]}_hidden.js`;
     } else {
       data = await readFile("actionHiddenTemplate.js", "utf8");
       modified = data.replace(/replaceAction/g, cds);
+      filePath = `./dynamic-app/${type}/${[cds]}_action_hidden.js`;
     }
 
     await writeFile(filePath, modified, "utf8");
@@ -53,7 +55,7 @@ async function run(type, cds) {
     }
 
     await writeFile(filePath, modified, "utf8");
-    await addToIndex(generatedTrigger, type);
+    await addToIndex(cds, type);
   } catch (error) {
     console.log("run ", error);
   }
@@ -94,7 +96,14 @@ const addToIndex = async (value, type) => {
     const readRes = await readFile("./dynamic-app/index.js", "utf8");
     console.log(readRes);
     const lines = readRes.split("\n");
-    const added = `const ` + value + ` = require("./${type}/` + value + `")`;
+    const line_to_add = ``;
+    if (type === "triggers") {
+      line_to_add = `const ` + value + ` = require("./${type}/` + value + `")`;
+    } else {
+      line_to_add =
+        `const ` + value + ` = require("./${type}/` + value + `_action` + `")`;
+    }
+    const added = line_to_add;
     lines.splice(counter, 0, added); // Insert the new line at the specified index
     console.log(lines[counter]);
     counter = counter - 1;
