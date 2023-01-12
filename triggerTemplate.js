@@ -2,7 +2,7 @@ const NexusClient = require("grindery-nexus-client").default;
 const jwt_decode = require("jwt-decode");
 
 const driver_id = "replaceTrigger";
-const replaceTrigger_hidden = require("./replaceTrigger_hidden")
+const replaceTrigger_hidden = require("./replaceTrigger_hidden");
 
 //uniqueID Generate Token ID
 function uniqueID() {
@@ -50,7 +50,6 @@ const creatorID = async (z, bundle) => {
 
 // triggers on a new trigger_from_a_grindery_workflow with a certain tag
 const perform = async (z, bundle) => {
-  
   return [bundle.cleanedRequest];
 };
 
@@ -167,7 +166,7 @@ const subscribeHook = async (z, bundle) => {
           z.console.log("Selected Trigger ", this_trigger);
           trigger = {
             type: "trigger",
-            connector: bundle.inputData.driver_id,
+            connector: driver_id,
             operation: bundle.inputData.trigger_id,
             input: input,
           };
