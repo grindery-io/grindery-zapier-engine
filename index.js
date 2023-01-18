@@ -170,46 +170,58 @@ app.post("/githubUpdate", async (req, res) => {
   //reporsitory =
   //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
 
-  shell.exec(
-    `git clone "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"`
+  pullSchema(
+    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
   );
   pullDynamic(
-    "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+    "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
   );
   //format key name files
   const added = keyNames(value.commits[0].added);
+  //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref);
   if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
 
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
-    
-    await loop(added)
-    // push to zapier
-    //await pushDynamic();
-    //await sendNotification();
-     // push to zapier
-    
+    for (let index = 0; index < added.length; index++) {
+      const element = added[index];
+      const trigger = await checkIftriggerOrAction(element, 1);
+      const action = await checkIftriggerOrAction(element, 2);
+      if (trigger) {
+        await runHidden("triggers", element);
+        await run("triggers", element);
+      }
+      if (action) {
+        //TO-DO
+        await runHidden("creates", added[index]);
+        await run("creates", added[index]);
+      }
+    }
+    console.log(branch)
     if(branch == "master"){
       // {
       //   "id": 174957,
       //   "key": "App174957"
       // }
-      await pushDynamic()
+      await replaceRCfile("production")
+      await pushDynamic("production")
     }else if(branch == "staging"){
       // {
       //   "id": 175726,
       //   "key": "App175726"
       // }
-      await pushDynamic();
+      await replaceRCfile("staging")
+      await pushDynamic("staging");
     }
+
+    //await sendNotification()
 
     res.status(200).json({ res: "hello" });
   } else {
     res.status(400).json({ res: "request again", payload: value });
   }
-
   //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
 });
 
