@@ -196,8 +196,8 @@ app.post("/githubUpdate", async (req, res) => {
 app.post("/getUpdate", async (req, res) => {
   //parse payload from github webhook
   
-  //const value = JSON.parse(req.body.payload);
-  const value = req.body;
+  const value = JSON.parse(req.body.payload);
+  //const value = req.body;
   pullSchema(
     "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
   );
