@@ -87,6 +87,25 @@ async function checkIftriggerOrAction(value, type) {
   }
 }
 
+const removeFromIndex = async (value, type) => {
+  const FILE_LOCATION = './test.js'
+  
+  const readRes = await readFile(FILE_LOCATION, "utf8");
+  //console.log(readRes);
+  let lines = readRes.split("\n");
+  
+  lines.map(async (line, index) => {
+      if(line === 'const sample = require("./triggers/trigger_zap_from_grindery");'){
+          delete lines[index];
+          const res = await writeFile(
+              FILE_LOCATION,
+              lines.join("\n"),
+              "utf8"
+          );
+      }
+  });
+};
+
 const addToIndex = async (value, type) => {
   let counter = 18;
   // Read the contents of the file
