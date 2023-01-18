@@ -178,6 +178,7 @@ app.post("/githubUpdate", async (req, res) => {
   );
   //format key name files
   const added = keyNames(value.commits[0].added);
+  const branch = getBranch(value.ref);
   if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
 
