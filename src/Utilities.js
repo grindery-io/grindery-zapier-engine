@@ -1,7 +1,7 @@
 
 export const keyNames =(value) =>{
   let output = []
-  console.log(Array.isArray(value))
+  console.log(value)
   if(Array.isArray(value)){
       for(var i = 0; i <= value.length - 1; i++){
           console.log(value[i])
@@ -19,5 +19,5 @@ export const keyNames =(value) =>{
 
 export const getBranch = (ref)=>{
     const value = ref.split("/")
-    console.log(value[value.length - 1])
+    return (value[value.length - 1])
 }

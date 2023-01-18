@@ -58,6 +58,24 @@ async function run(type, cds) {
     console.log("run ", error);
   }
 }
+async function replaceRCfile(type) {
+  try {
+    let data = {};
+    let modified = {};
+    let filePath = `./dynamic-app/.zapierapprc`;
+    if (type === "production") {
+      data = await readFile(".zapierapprcProduction", "utf8");
+      
+    } else {
+      data = await readFile(".zapierapprcStaging", "utf8");
+     
+    }
+    await writeFile(filePath, data, "utf8");
+  
+  } catch (error) {
+    console.log("replaceRC ", error);
+  }
+}
 async function checkIftriggerOrAction(value, type) {
   try {
     //Trigger = 1, Action = 2 @Juan
@@ -92,7 +110,7 @@ const addToIndex = async (value, type) => {
   // Read the contents of the file
   try {
     const readRes = await readFile("./dynamic-app/index.js", "utf8");
-    console.log(readRes);
+   
     let lines = readRes.split("\n");
     let line_to_add = ``;
     if (type === "triggers") {
@@ -105,7 +123,7 @@ const addToIndex = async (value, type) => {
     }
     const added = line_to_add;
     lines.splice(counter, 0, added); // Insert the new line at the specified index
-    console.log(lines[counter]);
+   
     counter = counter - 1;
     // Join the lines back together and write the modified contents back to the file
     const res = await writeFile(
@@ -149,8 +167,23 @@ app.post("/githubUpdate", async (req, res) => {
     
     await loop(added)
     // push to zapier
-    await pushDynamic();
-    await sendNotification();
+    //await pushDynamic();
+    //await sendNotification();
+     // push to zapier
+    
+    if(branch == "master"){
+      // {
+      //   "id": 174957,
+      //   "key": "App174957"
+      // }
+      await pushDynamic()
+    }else if(branch == "staging"){
+      // {
+      //   "id": 175726,
+      //   "key": "App175726"
+      // }
+      await pushDynamic();
+    }
 
     res.status(200).json({ res: "hello" });
   } else {
@@ -162,7 +195,9 @@ app.post("/githubUpdate", async (req, res) => {
 
 app.post("/getUpdate", async (req, res) => {
   //parse payload from github webhook
-  const value = JSON.parse(req.body.payload);
+  
+  //const value = JSON.parse(req.body.payload);
+  const value = req.body;
   pullSchema(
     "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
   );
@@ -172,7 +207,7 @@ app.post("/getUpdate", async (req, res) => {
 
   //format key name files
   const added = keyNames(value.commits[0].added);
-  const removed = keyNames(value.commits[0].removed);
+  //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref);
   if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
@@ -193,8 +228,23 @@ app.post("/getUpdate", async (req, res) => {
         await run("creates", added[index]);
       }
     }
-    // push to zapier
-    await pushDynamic();
+    console.log(branch)
+    if(branch == "master"){
+      // {
+      //   "id": 174957,
+      //   "key": "App174957"
+      // }
+      await replaceRCfile("production")
+      await pushDynamic("production")
+    }else if(branch == "staging"){
+      // {
+      //   "id": 175726,
+      //   "key": "App175726"
+      // }
+      await replaceRCfile("staging")
+      await pushDynamic("staging");
+    }
+
     //await sendNotification()
 
     res.status(200).json({ res: "hello" });
@@ -242,13 +292,17 @@ const updateVersion = () => {
   shell.cd("./dynamic-app");
   shell.exec(`npm version patch --no-git-tag-version`);
 };
+const updateClient = () =>{
+  shell.exec('npm update grindery-nexus-client')
+}
 const pushDynamic = async (repository) => {
   console.log("root folder");
   shell.exec("dir .");
   //shell.cd("..")
   console.log("after");
   updateVersion(); //update version before pushing to zapier
-
+  updateClient()
+  
   shell.exec("git init");
   shell.exec(`git config user.email clientaccess@connex.digital`);
   shell.exec(`git config user.name connex-clientaccess`);
