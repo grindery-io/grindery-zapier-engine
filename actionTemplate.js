@@ -11,7 +11,7 @@ const perform = async (z, bundle) => {
   let input = {}; //input object
   try {
     //Get the driver
-    let selected_driver_response = await client.getDriver(driver_id);
+    let selected_driver_response = await client.getDriver("replaceDriver");
     let selected_driver_actions = selected_driver_response.actions; //get the driver's actions
     let filteredActionArray = [];
     //get the selected driver action
@@ -97,7 +97,7 @@ module.exports = {
       async function (z, bundle) {
         const client = new NexusClient();
         try {
-          let response = await client.getDriver(driver_id);
+          let response = await client.getDriver("replaceDriver");
           //z.console.log("listing driver details: ", response);
           let driver_actions = response.actions; //match the selected driver
           let choices = {};

@@ -5,7 +5,7 @@ const perform = async (z, bundle) => {
   const client = new NexusClient();
   try{
     //z.console.log("attempting to retrieve this id: ", bundle.inputData.driver_id);
-    let response = await client.getDriver("replaceTrigger");
+    let response = await client.getDriver("replaceDriver");
     // this should return an array of objects
     let driver_triggers = response.triggers;
     if(driver_triggers){

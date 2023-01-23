@@ -270,12 +270,12 @@ const unsubscribeHook = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#triggerschema
-  key: "replaceTrigger",
-  noun: "replaceTrigger Token",
+  key: "replaceTriggerTitleCase",
+  noun: "replaceTriggerTitleCase Token",
 
   display: {
-    label: "replaceTrigger",
-    description: "evmWallet Blockchain Triggers",
+    label: "replaceTriggerTitleCase",
+    description: "Triggers when evmWallet Blockchain.",
   },
 
   operation: {
@@ -298,7 +298,7 @@ module.exports = {
         label: "Driver Trigger",
         type: "string",
         altersDynamicFields: true,
-        dynamic: "replaceTrigger_hidden.key",
+        dynamic: "replaceTriggerCamelCase_hidden.key",
       },
       async function (z, bundle) {
         console.log("Running Async function");

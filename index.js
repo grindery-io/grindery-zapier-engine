@@ -4,6 +4,7 @@ import bp from "body-parser";
 import fs from "fs"; //write read files
 import axios from "axios"; //call endpoint
 import util from "util"; //use promises for fs library
+import lodash from 'lodash'
 
 import { keyNames, getBranch } from "./src/Utilities.js";
 
@@ -27,12 +28,17 @@ async function runHidden(type, cds) {
     let filePath = ``;
     if (type === "triggers") {
       data = await readFile("triggerHiddenTemplate.js", "utf8");
-      modified = data.replace(/replaceTrigger/g, cds);
-      filePath = `./dynamic-app/${type}/${[cds]}_hidden.js`;
+      
+      modified = data.replace(/replaceDriver/g, cds);
+      let camelCase = cds.replace(/-/g, "_")
+      let titleCase = lodash.startCase(str)
+      modifiedTitleCase = data.replace(/replaceTriggerTitleCase/g, titleCase);
+      modifiedCamelCase = data.replace(/replaceTriggerCamelCase/g, camelCase);
+      filePath = `./GrindeyGatewayV3/${type}/${[cds]}_hidden.js`;
     } else {
       data = await readFile("actionHiddenTemplate.js", "utf8");
       modified = data.replace(/replaceAction/g, cds);
-      filePath = `./dynamic-app/triggers/${[cds]}_action_hidden.js`;
+      filePath = `./GrindeyGatewayV3/triggers/${[cds]}_action_hidden.js`;
     }
     await writeFile(filePath, modified, "utf8");
   } catch (error) {
@@ -44,11 +50,11 @@ async function run(type, cds) {
   try {
     let data = {};
     let modified = {};
-    let filePath = `./dynamic-app/${type}/${[cds]}.js`;
+    let filePath = `./GrindeyGatewayV3/${type}/${[cds]}.js`;
     if (type === "triggers") {
       data = await readFile("triggerTemplate.js", "utf8");
       modified = data.replace(/replaceTrigger/g, cds);
-    } else {
+    } else {replaceRCfile
       data = await readFile("actionTemplate.js", "utf8");
       modified = data.replace(/replaceAction/g, cds);
     }
@@ -62,7 +68,7 @@ async function replaceRCfile(type) {
   try {
     let data = {};
     let modified = {};
-    let filePath = `./dynamic-app/.zapierapprc`;
+    let filePath = `./GrindeyGatewayV3/.zapierapprc`;
     if (type === "production") {
       data = await readFile(".zapierapprcProduction", "utf8");
       
@@ -128,7 +134,7 @@ const addToIndex = async (value, type) => {
   let counter = 18;
   // Read the contents of the file
   try {
-    const readRes = await readFile("./dynamic-app/index.js", "utf8");
+    const readRes = await readFile("./GrindeyGatewayV3/index.js", "utf8");
    
     let lines = readRes.split("\n");
     let line_to_add = ``;
@@ -146,7 +152,7 @@ const addToIndex = async (value, type) => {
     counter = counter - 1;
     // Join the lines back together and write the modified contents back to the file
     const res = await writeFile(
-      "./dynamic-app/index.js",
+      "./GrindeyGatewayV3/index.js",
       lines.join("\n"),
       "utf8"
     );
@@ -165,21 +171,32 @@ async function loop(added){
   return 
 }
 app.post("/githubUpdate", async (req, res) => {
-  //parse payload from github webhook
-  const value = JSON.parse(req.body.payload);
-  //reporsitory =
-  //shell.exec(`git clone "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`)
-
-  pullSchema(
-    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
-  );
-  pullDynamic(
-    "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
-  );
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
   //format key name files
   const added = keyNames(value.commits[0].added);
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref);
+  let repository = ""
+
+
+  if(branch == "master"){
+    repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/GrindeyGatewayV3"
+    pullDynamic(
+      "https://connex-clientaccess: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@github.com/connex-clientaccess/GrindeyGatewayV3"
+    );  
+  }else if(branch == "staging"){
+    repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/GrinderyGatewayV3"
+    pullGateway(
+      "https://connex-clientaccess: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@github.com/connex-clientaccess/GrinderyGatewayV3"
+    );
+  
+  }
+  pullSchema(
+    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
+  );
+  
+  
   if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
 
@@ -206,14 +223,14 @@ app.post("/githubUpdate", async (req, res) => {
       //   "key": "App174957"
       // }
       await replaceRCfile("production")
-      await pushDynamic("production")
+      await pushDynamic(repository)
     }else if(branch == "staging"){
       // {
       //   "id": 175726,
       //   "key": "App175726"
       // }
       await replaceRCfile("staging")
-      await pushDynamic("staging");
+      await pushDynamic(repository);
     }
 
     //await sendNotification()
@@ -222,7 +239,8 @@ app.post("/githubUpdate", async (req, res) => {
   } else {
     res.status(400).json({ res: "request again", payload: value });
   }
-  //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
+
+  //pushDynamic("https://github.com/connex-clientaccess/GrindeyGatewayV3");
 });
 
 app.post("/getUpdate", async (req, res) => {
@@ -234,7 +252,7 @@ app.post("/getUpdate", async (req, res) => {
     "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
   );
   pullDynamic(
-    "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+    "https://connex-clientaccess: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@github.com/connex-clientaccess/GrindeyGatewayV3"
   );
 
   //format key name files
@@ -284,7 +302,7 @@ app.post("/getUpdate", async (req, res) => {
     res.status(400).json({ res: "request again", payload: value });
   }
 
-  //pushDynamic("https://github.com/connex-clientaccess/dynamic-app");
+  //pushDynamic("https://github.com/connex-clientaccess/GrindeyGatewayV3");
 });
 
 async function sendNotification() {
@@ -299,7 +317,22 @@ async function sendNotification() {
 }
 
 const pullDynamic = (repository) => {
-  let path = `./dynamic-app`;
+  let path = `./GrindeyGatewayV3`;
+  //console.log("root folder")
+  //shell.exec(`dir .`)
+  shell.cd(path); //inside dynamic
+  shell.exec(`git init `);
+  shell.exec(`git pull ${repository}`);
+  //console.log(path)
+  shell.exec(`npm i`);
+  //console.log("after install")
+  //shell.exec(`dir .`)
+  shell.cd(".."); //back to index
+  //console.log("back to root folder")
+  //shell.exec(`dir .`)
+};
+const pullGateway = (repository) => {
+  let path = `./GrinderyGatewayV3`;
   //console.log("root folder")
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
@@ -321,7 +354,7 @@ const pullSchema = (repository) => {
 };
 
 const updateVersion = () => {
-  shell.cd("./dynamic-app");
+  shell.cd("./GrindeyGatewayV3");
   shell.exec(`npm version patch --no-git-tag-version`);
 };
 const updateClient = () =>{
@@ -334,15 +367,16 @@ const pushDynamic = async (repository) => {
   console.log("after");
   updateVersion(); //update version before pushing to zapier
   updateClient()
-  
+  //STOP GITHUB PUSH 
   shell.exec("git init");
   shell.exec(`git config user.email clientaccess@connex.digital`);
   shell.exec(`git config user.name connex-clientaccess`);
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
-    `git push "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"`
+    `git push ${repository}`
   );
+  //Until here
   console.log("after update version");
   shell.cd("..");
 
@@ -355,8 +389,8 @@ app.listen(PORT, () => {
   console.log(`Now listening on port ${PORT}`);
 });
 // app.post("/runPull", async (req, res) => {
-//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
-//   let path = `./dynamic-app`
+//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/GrindeyGatewayV3"
+//   let path = `./GrindeyGatewayV3`
 //   console.log("root folder")
 //   shell.exec(`dir .`)
 //   shell.cd(path) //inside dynamic
@@ -374,7 +408,7 @@ app.listen(PORT, () => {
 
 // app.post("/runPush", async (req, res) => {
 
-//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/dynamic-app"
+//   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/GrindeyGatewayV3"
 //   pullDynamic(repository)
 //   console.log("root folder")
 //   shell.exec("dir .")
@@ -413,7 +447,7 @@ app.listen(PORT, () => {
 //   async function runHidden(type, generatedTrigger){
 //     try {
 
-//         const filePath = `./dynamic-app/${type}/${[generatedTrigger]}_hidden.js`
+//         const filePath = `./GrindeyGatewayV3/${type}/${[generatedTrigger]}_hidden.js`
 //         const readRes = fs.readFile('triggerHiddenTemplate.js', 'utf8', (err, data) => {
 //           if (err) {
 //             return console.log(err);
@@ -441,7 +475,7 @@ app.listen(PORT, () => {
 // async function run(type, generatedTrigger){
 //     try {
 
-//         const filePath = `./dynamic-app/${type}/${[generatedTrigger]}.js`
+//         const filePath = `./GrindeyGatewayV3/${type}/${[generatedTrigger]}.js`
 //         const readRes = fs.readFile('triggerTemplate.js', 'utf8', (err, data) => {
 //           if (err) {
 //             return console.log(err);

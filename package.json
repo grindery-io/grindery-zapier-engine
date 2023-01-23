@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node index.js",
     "pushtozapier": "cd ./PokeApi && zapier push",
-    "pushdynamic": "cd ./dynamic-app && zapier push",
+    "pushdynamic": "cd ./GrinderyGatewayV3 && zapier push",
     "pushdynamicLink": "cd ./dynamic-app && zapier link",
     "login": "echo 9f4c03fa427d81d0ee85dcc69abab093 | zapier login --sso ",
     "simplelogin": "zapier login --sso ",
@@ -14,6 +14,7 @@
     "body-parser": "^1.20.1",
     "express": "^4.18.2",
     "glob": "^8.0.3",
+    "lodash": "^4.17.21",
     "mongodb": "^4.13.0",
     "replace-in-file": "^6.3.5",
     "shelljs": "^0.8.5",
@@ -22,7 +23,7 @@
     "zapier-platform-cli": "12.2.0",
     "zapier-platform-core": "12.2.0"
   },
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "new-grindery-update",
   "main": "index.js",
   "author": "",
