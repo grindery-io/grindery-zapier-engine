@@ -270,7 +270,7 @@ const unsubscribeHook = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#triggerschema
-  key: "replaceTriggerTitleCase",
+  key: "replaceTriggerCamelCase",
   noun: "replaceTriggerTitleCase Token",
 
   display: {

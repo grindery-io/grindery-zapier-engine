@@ -36,12 +36,12 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#triggerschema
-  key: "replaceActionTitleCase_action_hidden",
+  key: "replaceActionCamelCase_action_hidden",
   noun: "replaceActionTitleCase Actions",
 
   display: {
     label: "replaceActionTitleCase Actions",
-    description: "Triggers when a new replaceActionTitleCase is created.",
+    description: "Triggers new replaceAction events.",
     hidden: true,
   },
 

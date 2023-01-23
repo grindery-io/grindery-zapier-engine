@@ -71,12 +71,12 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#createschema
-  key: "replaceActionTitleCase",
+  key: "replaceActionCamelCase",
   noun: "replaceActionTitleCase",
 
   display: {
     label: "replaceActionTitleCase Actions",
-    description: "Configure actions using replaceAction directly in Zapier.",
+    description: "Configure actions using replaceActionCamelCase directly in Zapier.",
   },
 
   operation: {
