@@ -1,7 +1,7 @@
 const NexusClient = require("grindery-nexus-client").default;
 
-const driver_id = "replaceAction";
-const replaceAction_action_hidden = require("../triggers/replaceAction_action_hidden");
+const driver_id = "replaceActionCamelCase";
+const replaceActionCamelCase_action_hidden = require("../triggers/replaceActionCamelCase_action_hidden");
 
 // create a particular run_grindery_action by name
 const perform = async (z, bundle) => {
@@ -71,11 +71,11 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#createschema
-  key: "replaceAction",
-  noun: "replaceAction",
+  key: "replaceActionTitleCase",
+  noun: "replaceActionTitleCase",
 
   display: {
-    label: "replaceAction Actions",
+    label: "replaceActionTitleCase Actions",
     description: "Configure actions using erc20 directly in Zapier",
   },
 
@@ -92,7 +92,7 @@ module.exports = {
         type: "string",
         required: true,
         altersDynamicFields: true,
-        dynamic: "replaceAction_action_hidden.key",
+        dynamic: "replaceActionTitleCase_action_hidden.key",
       },
       async function (z, bundle) {
         const client = new NexusClient();

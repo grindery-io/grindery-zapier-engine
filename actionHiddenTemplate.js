@@ -24,7 +24,7 @@ const perform = async (z, bundle) => {
     }
   } catch (error) {
     z.console.log(
-      "Auth Error in List Driver Actions Trigger (replaceAction_hidden.js)",
+      "Auth Error in List Driver Actions Trigger (replaceActionCamelCase_hidden.js)",
       error.message
     );
     if (error.message === "Invalid access token") {
@@ -36,12 +36,12 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#triggerschema
-  key: "replaceAction_action_hidden",
-  noun: "replaceAction Actions",
+  key: "replaceActionTitleCase_action_hidden",
+  noun: "replaceActionTitleCase Actions",
 
   display: {
-    label: "replaceAction Actions",
-    description: "Triggers when a new replaceAction is created.",
+    label: "replaceActionTitleCase Actions",
+    description: "Triggers when a new replaceActionTitleCase is created.",
     hidden: true,
   },
 

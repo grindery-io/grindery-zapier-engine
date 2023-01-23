@@ -33,12 +33,12 @@ const perform = async (z, bundle) => {
 module.exports = {
   // see here for a full list of available properties:
   // https://github.com/zapier/zapier-platform/blob/master/packages/schema/docs/build/schema.md#triggerschema
-  key: `replaceTrigger_hidden`,
-  noun: `replaceTrigger Token`,
+  key: `replaceTriggerTitleCase_hidden`,
+  noun: `replaceTriggerTitleCase Token`,
 
   display: {
-    label: `replaceTrigger Token`,
-    description: `Triggers when a new replaceTrigger_hidden is created.`,
+    label: `replaceTriggerTitleCase Token`,
+    description: `Triggers when a new replaceTriggerCamelCase is created.`,
     hidden:true
   },
 

@@ -1,8 +1,8 @@
 const NexusClient = require("grindery-nexus-client").default;
 const jwt_decode = require("jwt-decode");
 
-const driver_id = "replaceTrigger";
-const replaceTrigger_hidden = require("./replaceTrigger_hidden");
+const driver_id = "replaceTriggerCamelCase";
+const replaceTriggerTitleCase_hidden = require("./replaceTriggerCamelCase_hidden");
 
 //uniqueID Generate Token ID
 function uniqueID() {
@@ -35,13 +35,13 @@ const creatorID = async (z, bundle) => {
     //force token refresh if invalid
     if (error.message === "Invalid access token") {
       z.console.log(
-        "Auth Error in creatorID function (replaceTrigger.js)",
+        "Auth Error in creatorID function (replaceTriggerCamelCase.js)",
         error.message
       );
       throw new z.errors.RefreshAuthError();
     } else {
       z.console.log(
-        "Error in creatorID function (replaceTrigger.js)",
+        "Error in creatorID function (replaceTriggerCamelCase.js)",
         error.message
       );
     }
@@ -298,7 +298,7 @@ module.exports = {
         label: "Driver Trigger",
         type: "string",
         altersDynamicFields: true,
-        dynamic: "replaceTriggerCamelCase_hidden.key",
+        dynamic: "replaceTriggerTitleCase_hidden.key",
       },
       async function (z, bundle) {
         console.log("Running Async function");
