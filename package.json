@@ -23,7 +23,7 @@
     "zapier-platform-cli": "12.2.0",
     "zapier-platform-core": "12.2.0"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "name": "new-grindery-update",
   "main": "index.js",
   "author": "",
