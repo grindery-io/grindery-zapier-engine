@@ -179,7 +179,9 @@ app.post("/githubUpdate", async (req, res) => {
   const branch = getBranch(value.ref);
   let repository = ""
 
-
+  pullSchema(
+    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
+  );
   if(branch == "master"){
     repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/GrindeyGatewayV3"
     pullDynamic(
@@ -190,11 +192,8 @@ app.post("/githubUpdate", async (req, res) => {
     pullGateway(
       "https://connex-clientaccess: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@github.com/connex-clientaccess/GrinderyGatewayV3"
     );
-  
   }
-  pullSchema(
-    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
-  );
+  
   
   
   if (added != undefined) {
