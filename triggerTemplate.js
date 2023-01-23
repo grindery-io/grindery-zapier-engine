@@ -275,7 +275,7 @@ module.exports = {
 
   display: {
     label: "replaceTriggerTitleCase",
-    description: "Triggers when evmWallet Blockchain.",
+    description: "Triggers when replaceTriggerTitleCase Blockchain event occurs.",
   },
 
   operation: {

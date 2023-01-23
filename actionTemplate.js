@@ -76,7 +76,7 @@ module.exports = {
 
   display: {
     label: "replaceActionTitleCase Actions",
-    description: "Configure actions using erc20 directly in Zapier",
+    description: "Configure actions using replaceAction directly in Zapier.",
   },
 
   operation: {
