@@ -185,8 +185,8 @@ async function loop(added){
   return 
 }
 app.post("/githubUpdate", async (req, res) => {
-  //const value = JSON.parse(req.body.payload); //PRODUCTION
-  const value = req.body; //TESTING POSTMAN
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
   //format key name files
   const added = keyNames(value.commits[0].added);
   //const removed = keyNames(value.commits[0].removed);
