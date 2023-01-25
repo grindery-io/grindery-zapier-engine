@@ -185,8 +185,8 @@ async function loop(added){
   return 
 }
 app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
   //format key name files
   const added = keyNames(value.commits[0].added);
   //const removed = keyNames(value.commits[0].removed);
@@ -341,7 +341,7 @@ const pullRepository = (repository, repoName) => {
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
-  shell.exec(`git pull ${repository}`);
+  shell.exec(`git pull https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`);
   //console.log(path)
   shell.exec(`npm i`);
   //console.log("after install")
@@ -379,7 +379,7 @@ const pushToZapier = async (repoName) => {
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
-    `git push ${repository}`
+    `git push https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`
   );
   //Until here
   console.log("after update version");

@@ -2,7 +2,7 @@ const NexusClient = require("grindery-nexus-client").default;
 const jwt_decode = require("jwt-decode");
 
 const driver_id = "replaceTriggerCamelCase";
-const replaceTriggerTitleCase_hidden = require("./replaceTriggerCamelCase_hidden");
+const replaceTriggerCamelCase_hidden = require("./replaceTriggerCamelCase_hidden");
 
 //uniqueID Generate Token ID
 function uniqueID() {
@@ -298,7 +298,7 @@ module.exports = {
         label: "Driver Trigger",
         type: "string",
         altersDynamicFields: true,
-        dynamic: "replaceTriggerTitleCase_hidden.key",
+        dynamic: "replaceTriggerCamelCase_hidden.key",
       },
       async function (z, bundle) {
         console.log("Running Async function");
