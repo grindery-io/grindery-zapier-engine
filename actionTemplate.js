@@ -92,7 +92,7 @@ module.exports = {
         type: "string",
         required: true,
         altersDynamicFields: true,
-        dynamic: "replaceActionTitleCase_action_hidden.key",
+        dynamic: "replaceActionCamelCase_action_hidden.key",
       },
       async function (z, bundle) {
         const client = new NexusClient();

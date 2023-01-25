@@ -66,7 +66,7 @@ async function run(type, cds, repoName) {
       modified = modified.replace(/replaceTriggerTitleCase/g, titleCase);
       modified = modified.replace(/replaceTriggerCamelCase/g, camelCase);
     } else {
-      console.log("actionsHidden, ",titleCase)
+      console.log("actions, ",titleCase)
       data = await readFile("actionTemplate.js", "utf8");
       modified = data.replace(/replaceDriver/g, cds);
       modified = modified.replace(/replaceActionTitleCase/g, titleCase);
