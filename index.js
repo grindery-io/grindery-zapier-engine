@@ -4,7 +4,6 @@ import bp from "body-parser";
 import fs from "fs"; //write read files
 import axios from "axios"; //call endpoint
 import util from "util"; //use promises for fs library
-import lodash from 'lodash'
 
 import { keyNames, getBranch } from "./src/Utilities.js";
 
@@ -185,8 +184,8 @@ async function loop(added){
   return 
 }
 app.post("/githubUpdate", async (req, res) => {
-  //const value = JSON.parse(req.body.payload); //PRODUCTION
-  const value = req.body; //TESTING POSTMAN
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
   //format key name files
   const added = keyNames(value.commits[0].added);
   //const removed = keyNames(value.commits[0].removed);
