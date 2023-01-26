@@ -85,10 +85,8 @@ async function replaceRCfile(type, repoName) {
     let filePath = `./${repoName}/.zapierapprc`;
     if (type === "production") {
       data = await readFile(".zapierapprcProduction", "utf8");
-      
     } else {
       data = await readFile(".zapierapprcStaging", "utf8");
-     
     }
     await writeFile(filePath, data, "utf8");
   
@@ -174,24 +172,17 @@ const addToIndex = async (value, type, repoName) => {
     console.log("addToIndex ", error);
   }
 };
-async function loop(added){
-  for (let index = 0; index < added.length; index++) {
-    await runHidden("triggers", added[index]);
-    await runHidden("creates", added[index]);
-    await run("triggers", added[index]);
-    await run("creates", added[index]);
-  }
-  return 
-}
+
 app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload); //PRODUCTION
   //const value = req.body; //TESTING POSTMAN
   //format key name files
-  const added = keyNames(value.commits[0].added);
+  const added = keyNames(value.commits[0].added); //get key names
   //const removed = keyNames(value.commits[0].removed);
-  const branch = getBranch(value.ref);
+  const branch = getBranch(value.ref); //get branch
   let repoName = ""
 
+  //Pull repositories
   pullSchema(
     "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
   );
@@ -210,8 +201,6 @@ app.post("/githubUpdate", async (req, res) => {
     );
   }
   
-  
-  
   if (added != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
 
@@ -227,8 +216,8 @@ app.post("/githubUpdate", async (req, res) => {
       }
       if (action) {
         //TO-DO
-        await runHidden("creates", added[index], repoName);
-        await run("creates", added[index], repoName);
+        await runHidden("creates", element, repoName);
+        await run("creates", element, repoName);
       }
     }
     console.log(branch)
@@ -237,20 +226,20 @@ app.post("/githubUpdate", async (req, res) => {
       //   "id": 174957,
       //   "key": "App174957"
       // }
-      await replaceRCfile("production")
+      await replaceRCfile("production", repoName)
       await pushToZapier(repoName)
     }else if(branch == "staging"){
       // {
       //   "id": 175726,
       //   "key": "App175726"
       // }
-      await replaceRCfile("staging")
+      await replaceRCfile("staging", repoName)
       await pushToZapier(repoName);
     }
 
-    //await sendNotification()
+    await sendNotification()
 
-    res.status(200).json({ res: "hello" });
+    res.status(200).json({ res: "Done!" });
   } else {
     res.status(400).json({ res: "request again", payload: value });
   }
@@ -258,69 +247,6 @@ app.post("/githubUpdate", async (req, res) => {
   //pushDynamic("https://github.com/connex-clientaccess/${repoName}");
 });
 
-app.post("/getUpdate", async (req, res) => {
-  //parse payload from github webhook
-  
-  const value = JSON.parse(req.body.payload);
-  //const value = req.body;
-  pullSchema(
-    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
-
-  );
-  pullDynamic(
-    `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`
-
-  );
-
-  //format key name files
-  const added = keyNames(value.commits[0].added);
-  //const removed = keyNames(value.commits[0].removed);
-  const branch = getBranch(value.ref);
-  if (added != undefined) {
-    //const added= ["erc20", "erc721", "gnosisSafe"]
-
-    // const removed = keyNames(value.commits[0].removed);
-    // console.log(removed);
-    for (let index = 0; index < added.length; index++) {
-      const element = added[index];
-      const trigger = await checkIftriggerOrAction(element, 1);
-      const action = await checkIftriggerOrAction(element, 2);
-      if (trigger) {
-        await runHidden("triggers", element);
-        await run("triggers", element);
-      }
-      if (action) {
-        //TO-DO
-        await runHidden("creates", added[index]);
-        await run("creates", added[index]);
-      }
-    }
-   
-    if(branch == "master"){
-      // {
-      //   "id": 174957,
-      //   "key": "App174957"
-      // }
-      await replaceRCfile("production")
-      await pushDynamic("production")
-    }else if(branch == "staging"){
-      // {
-      //   "id": 175726,
-      //   "key": "App175726"
-      // }
-      await replaceRCfile("staging")
-      await pushGateway("staging");
-    }
-
-    //await sendNotification()
-
-    res.status(200).json({ res: "hello" });
-  } else {
-    res.status(400).json({ res: "request again", payload: value });
-  }
-
-  //pushDynamic("https://github.com/connex-clientaccess/${repoName}");
-});
 
 async function sendNotification() {
   try {
