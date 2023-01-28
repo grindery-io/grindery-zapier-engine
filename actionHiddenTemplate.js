@@ -41,7 +41,7 @@ module.exports = {
 
   display: {
     label: "replaceActionTitleCase Actions",
-    description: "Triggers new replaceAction events.",
+    description: "Triggers new replaceActionTitleCase events.",
     hidden: true,
   },
 
