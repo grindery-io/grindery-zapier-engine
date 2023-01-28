@@ -186,14 +186,14 @@ app.post("/githubUpdate", async (req, res) => {
   pullSchema(
     "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
   );
-  if(branch == "master"){
+  if(branch == "staging"){
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
     repoName = "dynamic-app"
     pullRepository(
       `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`,
       repoName
     );  
-  }else if(branch == "staging"){
+  }else if(branch == "master"){
     repoName = "GrinderyGatewayV3"
     pullRepository(
       `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`,
@@ -221,19 +221,19 @@ app.post("/githubUpdate", async (req, res) => {
       }
     }
     console.log(branch)
-    if(branch == "master"){
+    if(branch == "staging"){
       // {
       //   "id": 174957,
       //   "key": "App174957"
       // }
-      await replaceRCfile("production", repoName)
+      await replaceRCfile("staging", repoName)
       await pushToZapier(repoName)
-    }else if(branch == "staging"){
+    }else if(branch == "master"){
       // {
       //   "id": 175726,
       //   "key": "App175726"
       // }
-      await replaceRCfile("staging", repoName)
+      await replaceRCfile("production", repoName)
       await pushToZapier(repoName);
     }
 
