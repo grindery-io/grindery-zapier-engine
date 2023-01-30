@@ -216,8 +216,8 @@ const addToIndex = async (value, type, repoName) => {
 };
 
 app.post("/githubUpdate", async (req, res) => {
-  //const value = JSON.parse(req.body.payload); //PRODUCTION
-  const value = req.body; //TESTING POSTMAN
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
   //format key name files
   let added = ""
   let removed = ""
@@ -280,22 +280,22 @@ app.post("/githubUpdate", async (req, res) => {
         }
       }
     }
-    // console.log(branch)
-    // if(branch == "staging"){
-    //   // {
-    //   //   "id": 174957,
-    //   //   "key": "App174957"
-    //   // }
-    //   await replaceRCfile("staging", repoName)
-    //   await pushToZapier(repoName)
-    // }else if(branch == "master"){
-    //   // {
-    //   //   "id": 175726,
-    //   //   "key": "App175726"
-    //   // }
-    //   await replaceRCfile("production", repoName)
-    //   await pushToZapier(repoName);
-    // }
+    console.log(branch)
+    if(branch == "staging"){
+      // {
+      //   "id": 174957,
+      //   "key": "App174957"
+      // }
+      await replaceRCfile("staging", repoName)
+      await pushToZapier(repoName)
+    }else if(branch == "master"){
+      // {
+      //   "id": 175726,
+      //   "key": "App175726"
+      // }
+      await replaceRCfile("production", repoName)
+      await pushToZapier(repoName);
+    }
   
     //await sendNotification()
     
