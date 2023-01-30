@@ -157,7 +157,7 @@ const removeFromIndex = async (value, type) => {
   }
 };
 
-const removeFiles = (cds, repoName) => {
+const removeFiles = async(cds, repoName) => {
   try {
     console.log("running remove files")
     const createsPath =  'dynamic-app/creates';
@@ -178,8 +178,8 @@ const removeFiles = (cds, repoName) => {
       deleteFile(filePath);
     });
 
-    removeFromIndex(camelCase, "creates")
-    removeFromIndex(camelCase, "triggers")
+    await removeFromIndex(camelCase, "creates")
+    await removeFromIndex(camelCase, "triggers")
   }catch{
 
   }
