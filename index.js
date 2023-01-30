@@ -131,7 +131,7 @@ const removeFromIndex = async (value, type) => {
   let lines = readRes.split("\n");
   console.log("running remove from index")
   for (let index = 0; index < lines.length; index++) {
-      if(line.includes(`const ${value} = require("./${type}/${value}")`)){
+      if(lines[index].includes(`const ${value} = require("./${type}/${value}")`)){
           console.log(lines[index])
           delete lines[index];
           const res = await writeFile(
@@ -145,7 +145,7 @@ const removeFromIndex = async (value, type) => {
   const readRes2 = await readFile(FILE_LOCATION, "utf8");
   let lines2 = readRes2.split("\n");
   for (let index = 0; index < lines2.length; index++) {
-    if(line2.includes(`const ${value}_action = require("./${type}/${value}")`)){
+    if(lines2[index].includes(`const ${value}_action = require("./${type}/${value}")`)){
       console.log(lines2[index])
       delete lines2[index];
       const res = await writeFile(
