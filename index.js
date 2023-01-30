@@ -178,6 +178,9 @@ app.post("/githubUpdate", async (req, res) => {
   //const value = req.body; //TESTING POSTMAN
   //format key name files
   const added = keyNames(value.commits[0].added); //get key names
+  if(added == undefined || added == null){
+    res.status(400).json({ res: "request again", payload: value });
+  }
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref); //get branch
   let repoName = ""
