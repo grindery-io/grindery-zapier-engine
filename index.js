@@ -161,8 +161,10 @@ const removeFiles = (cds, repoName) => {
     console.log("running remove files")
     const createsPath =  'dynamic-app/creates';
     const triggersPath = 'dynamic-app/triggers';
-    const createsFiles = [`${cds}.js`];
-    const triggersFiles = [`${cds}.js`, `${cds}_hidden.js`, `${cds}_action_hidden.js`];
+    let camelCase = cds.replace(/-/g, "_")
+    
+    const createsFiles = [`${camelCase}.js`];
+    const triggersFiles = [`${camelCase}.js`, `${camelCase}_hidden.js`, `${camelCase}_action_hidden.js`];
     
     createsFiles.forEach(file => {
       console.log(file)
@@ -176,8 +178,8 @@ const removeFiles = (cds, repoName) => {
       //deleteFile(filePath);
     });
 
-    removeFromIndex(cds, "creates")
-    removeFromIndex(cds, "triggers")
+    removeFromIndex(camelCase, "creates")
+    removeFromIndex(camelCase, "triggers")
   }catch{
 
   }
@@ -227,10 +229,11 @@ app.post("/githubUpdate", async (req, res) => {
   if(value.commits[0].removed != undefined){
     removed = keyNames(value.commits[0].removed);
   }
-  
-  
+  console.log(value.commits[0].removed)
+  console.log(removed)
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref); //get branch
+  console.log(branch)
   let repoName = ""
 
   //Pull repositories
