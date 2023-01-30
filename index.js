@@ -4,7 +4,7 @@ import bp from "body-parser";
 import fs from "fs"; //write read files
 import axios from "axios"; //call endpoint
 import util from "util"; //use promises for fs library
-
+import path from "path"
 import { keyNames, getBranch } from "./src/Utilities.js";
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
@@ -16,7 +16,8 @@ app.use(bp.urlencoded({ extended: true }));
 
 // Convert fs.readFile to return a promise
 const readFile = util.promisify(fs.readFile);
-
+// Convert fs.unlink to return a promise
+const deleteFile = util.promisify(fs.unlink)
 // Convert fs.writeFile to return a promise
 const writeFile = util.promisify(fs.writeFile);
 
@@ -123,23 +124,64 @@ async function checkIftriggerOrAction(value, type) {
 }
 
 const removeFromIndex = async (value, type) => {
-  const FILE_LOCATION = './test.js'
+  const FILE_LOCATION = './dynamic-app/index.js'
   
   const readRes = await readFile(FILE_LOCATION, "utf8");
   //console.log(readRes);
   let lines = readRes.split("\n");
-  
+  console.log("running remove from index")
   lines.map(async (line, index) => {
-      if(line === 'const sample = require("./triggers/trigger_zap_from_grindery");'){
+      if(line.includes(`const ${value} = require("./${type}/${value}")`)){
+          console.log(lines[index])
           delete lines[index];
           const res = await writeFile(
               FILE_LOCATION,
               lines.join("\n"),
               "utf8"
           );
-      }
+      } 
   });
+  const readRes2 = await readFile(FILE_LOCATION, "utf8");
+  let lines2 = readRes2.split("\n");
+  lines2.map(async (line, index) => {
+    if(line.includes(`const ${value}_action = require("./${type}/${value}")`)){
+      console.log(lines2[index])
+      delete lines2[index];
+      const res = await writeFile(
+          FILE_LOCATION,
+          lines2.join("\n"),
+          "utf8"
+      );
+    }
+  })
 };
+
+const removeFiles = (cds, repoName) => {
+  try {
+    console.log("running remove files")
+    const createsPath =  'dynamic-app/creates';
+    const triggersPath = 'dynamic-app/triggers';
+    const createsFiles = [`${cds}.js`];
+    const triggersFiles = [`${cds}.js`, `${cds}_hidden.js`, `${cds}_action_hidden.js`];
+    
+    createsFiles.forEach(file => {
+      console.log(file)
+      const filePath = path.join(createsPath, file);
+     
+      //deleteFile(filePath);
+    });
+    triggersFiles.forEach(file => {
+      const filePath = path.join(triggersPath, file);
+      console.log(filePath)
+      //deleteFile(filePath);
+    });
+
+    removeFromIndex(cds, "creates")
+    removeFromIndex(cds, "triggers")
+  }catch{
+
+  }
+}
 
 const addToIndex = async (value, type, repoName) => {
   let counter = 18;
@@ -174,13 +216,19 @@ const addToIndex = async (value, type, repoName) => {
 };
 
 app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
   //format key name files
-  const added = keyNames(value.commits[0].added); //get key names
-  if(added == undefined || added == null){
-    res.status(400).json({ res: "request again", payload: value });
+  let added = ""
+  let removed = ""
+  if(value.commits[0].added != undefined){
+    added = keyNames(value.commits[0].added); //get key names'
   }
+  if(value.commits[0].removed != undefined){
+    removed = keyNames(value.commits[0].removed);
+  }
+  
+  
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref); //get branch
   let repoName = ""
@@ -204,44 +252,53 @@ app.post("/githubUpdate", async (req, res) => {
     );
   }
   
-  if (added != undefined) {
+  if (added != undefined || removed != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
 
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
-    for (let index = 0; index < added.length; index++) {
-      const element = added[index];
-      const trigger = await checkIftriggerOrAction(element, 1);
-      const action = await checkIftriggerOrAction(element, 2);
-      if (trigger) {
-        await runHidden("triggers", element, repoName);
-        await run("triggers", element, repoName);
-      }
-      if (action) {
-        //TO-DO
-        await runHidden("creates", element, repoName);
-        await run("creates", element, repoName);
+    console.log(removed)
+    if(removed != undefined){
+      for (let index = 0; index < removed.length; index++) {
+        const element = removed[index];
+        removeFiles(element, repoName)
       }
     }
-    console.log(branch)
-    if(branch == "staging"){
-      // {
-      //   "id": 174957,
-      //   "key": "App174957"
-      // }
-      await replaceRCfile("staging", repoName)
-      await pushToZapier(repoName)
-    }else if(branch == "master"){
-      // {
-      //   "id": 175726,
-      //   "key": "App175726"
-      // }
-      await replaceRCfile("production", repoName)
-      await pushToZapier(repoName);
+    if(added != undefined){
+      for (let index = 0; index < added.length; index++) {
+        const element = added[index];
+        const trigger = await checkIftriggerOrAction(element, 1);
+        const action = await checkIftriggerOrAction(element, 2);
+        if (trigger) {
+          await runHidden("triggers", element, repoName);
+          await run("triggers", element, repoName);
+        }
+        if (action) {
+          //TO-DO
+          await runHidden("creates", element, repoName);
+          await run("creates", element, repoName);
+        }
+      }
     }
-
-    await sendNotification()
-
+    // console.log(branch)
+    // if(branch == "staging"){
+    //   // {
+    //   //   "id": 174957,
+    //   //   "key": "App174957"
+    //   // }
+    //   await replaceRCfile("staging", repoName)
+    //   await pushToZapier(repoName)
+    // }else if(branch == "master"){
+    //   // {
+    //   //   "id": 175726,
+    //   //   "key": "App175726"
+    //   // }
+    //   await replaceRCfile("production", repoName)
+    //   await pushToZapier(repoName);
+    // }
+  
+    //await sendNotification()
+    
     res.status(200).json({ res: "Done!" });
   } else {
     res.status(400).json({ res: "request again", payload: value });
