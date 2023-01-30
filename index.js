@@ -167,16 +167,18 @@ const removeFiles = async(cds, repoName) => {
     const createsFiles = [`${camelCase}.js`];
     const triggersFiles = [`${camelCase}.js`, `${camelCase}_hidden.js`, `${camelCase}_action_hidden.js`];
     
-    createsFiles.forEach(file => {
+    for (let index = 0; index < createsFiles.length; index++) {
+      const file = array[index];
       console.log(file)
       const filePath = path.join(createsPath, file);
-      deleteFile(filePath);
-    });
-    triggersFiles.forEach(file => {
+      await deleteFile(filePath);
+    };
+    for (let index = 0; index < triggersFiles.length; index++) {
+      const file = array[index];
+      console.log(file)
       const filePath = path.join(triggersPath, file);
-      console.log(filePath)
-      deleteFile(filePath);
-    });
+      await deleteFile(filePath);
+    };
 
     await removeFromIndex(camelCase, "creates")
     await removeFromIndex(camelCase, "triggers")
