@@ -130,7 +130,7 @@ const removeFromIndex = async (value, type) => {
   //console.log(readRes);
   let lines = readRes.split("\n");
   console.log("running remove from index")
-  lines.map(async (line, index) => {
+  for (let index = 0; index < lines.length; index++) {
       if(line.includes(`const ${value} = require("./${type}/${value}")`)){
           console.log(lines[index])
           delete lines[index];
@@ -140,11 +140,12 @@ const removeFromIndex = async (value, type) => {
               "utf8"
           );
       } 
-  });
+  };
+  console.log("running remove from index 2")
   const readRes2 = await readFile(FILE_LOCATION, "utf8");
   let lines2 = readRes2.split("\n");
-  lines2.map(async (line, index) => {
-    if(line.includes(`const ${value}_action = require("./${type}/${value}")`)){
+  for (let index = 0; index < lines2.length; index++) {
+    if(line2.includes(`const ${value}_action = require("./${type}/${value}")`)){
       console.log(lines2[index])
       delete lines2[index];
       const res = await writeFile(
@@ -153,7 +154,7 @@ const removeFromIndex = async (value, type) => {
           "utf8"
       );
     }
-  })
+  }
 };
 
 const removeFiles = (cds, repoName) => {
@@ -169,13 +170,12 @@ const removeFiles = (cds, repoName) => {
     createsFiles.forEach(file => {
       console.log(file)
       const filePath = path.join(createsPath, file);
-     
-      //deleteFile(filePath);
+      deleteFile(filePath);
     });
     triggersFiles.forEach(file => {
       const filePath = path.join(triggersPath, file);
       console.log(filePath)
-      //deleteFile(filePath);
+      deleteFile(filePath);
     });
 
     removeFromIndex(camelCase, "creates")
