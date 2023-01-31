@@ -308,14 +308,14 @@ app.post("/githubUpdate", async (req, res) => {
       //   "id": 174957,
       //   "key": "App174957"
       // }
-      await replaceRCfile("staging", repoName)
+      await replaceRCfile("production", repoName)
       await pushToZapier(repoName)
     }else if(branch == "master"){
       // {
       //   "id": 175726,
       //   "key": "App175726"
       // }
-      await replaceRCfile("production", repoName)
+      await replaceRCfile("staging", repoName)
       await pushToZapier(repoName);
     }
   
