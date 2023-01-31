@@ -50,7 +50,7 @@ async function runHidden(type, cds, repoName) {
   }
 }
 
-async function run(type, cds, repoName) {
+async function run(type, cds, repoName, label) {
   try {
     let data = {};
     let modified = {};
@@ -65,12 +65,14 @@ async function run(type, cds, repoName) {
       modified = data.replace(/replaceDriver/g, cds);
       modified = modified.replace(/replaceTriggerTitleCase/g, titleCase);
       modified = modified.replace(/replaceTriggerCamelCase/g, camelCase);
+      modified = modified.replace(/replaceLabel/g, label);
     } else {
       console.log("actions, ",titleCase)
       data = await readFile("actionTemplate.js", "utf8");
       modified = data.replace(/replaceDriver/g, cds);
       modified = modified.replace(/replaceActionTitleCase/g, titleCase);
       modified = modified.replace(/replaceActionCamelCase/g, camelCase);
+      modified = modified.replace(/replaceLabelAction/g, label);
     }
     
     await writeFile(filePath, modified, "utf8");
@@ -219,9 +221,23 @@ const addToIndex = async (value, type, repoName) => {
   }
 };
 
+const getLabel = async(element) =>{
+  try {
+    //Trigger = 1, Action = 2 @Juan
+    const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
+   
+    const fileContent = await readFile(filePath, "utf8"); // read the file
+    
+    const parseContent = JSON.parse(fileContent);
+    console.log(parseContent.name)
+    return parseContent.name
+  }catch(error){
+    console.log("get label", error)
+  }
+}
 app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
   //format key name files
   let added = ""
   let removed = ""
@@ -274,14 +290,15 @@ app.post("/githubUpdate", async (req, res) => {
         const element = added[index];
         const trigger = await checkIftriggerOrAction(element, 1);
         const action = await checkIftriggerOrAction(element, 2);
+        const label = await getLabel(element)
         if (trigger) {
           await runHidden("triggers", element, repoName);
-          await run("triggers", element, repoName);
+          await run("triggers", element, repoName, label);
         }
         if (action) {
           //TO-DO
           await runHidden("creates", element, repoName);
-          await run("creates", element, repoName);
+          await run("creates", element, repoName, label);
         }
       }
     }

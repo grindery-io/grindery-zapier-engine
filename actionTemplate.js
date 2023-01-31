@@ -75,7 +75,7 @@ module.exports = {
   noun: "replaceActionTitleCase",
 
   display: {
-    label: "replaceActionTitleCase Actions",
+    label: "replaceLabelAction",
     description: "Configure actions using replaceActionCamelCase directly in Zapier.",
   },
 

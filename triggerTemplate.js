@@ -274,7 +274,7 @@ module.exports = {
   noun: "replaceTriggerTitleCase Token",
 
   display: {
-    label: "replaceTriggerTitleCase",
+    label: "replaceLabel",
     description: "Triggers when replaceTriggerTitleCase Blockchain event occurs.",
   },
 
