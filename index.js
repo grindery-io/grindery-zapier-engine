@@ -236,8 +236,8 @@ const getLabel = async(element) =>{
   }
 }
 app.post("/githubUpdate", async (req, res) => {
-  //const value = JSON.parse(req.body.payload); //PRODUCTION
-  const value = req.body; //TESTING POSTMAN
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
   //format key name files
   let added = ""
   let removed = ""
