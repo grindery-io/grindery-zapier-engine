@@ -282,7 +282,7 @@ app.post("/githubUpdate", async (req, res) => {
     if(removed != undefined){
       for (let index = 0; index < removed.length; index++) {
         const element = removed[index];
-        removeFiles(element, repoName)
+        await removeFiles(element, repoName)
       }
     }
     if(added != undefined){
