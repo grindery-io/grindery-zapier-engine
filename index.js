@@ -20,6 +20,8 @@ const readFile = util.promisify(fs.readFile);
 const deleteFile = util.promisify(fs.unlink)
 // Convert fs.writeFile to return a promise
 const writeFile = util.promisify(fs.writeFile);
+// Convert fs.exists to return a promise
+const existFile = util.promisify(fs.exists);
 
 async function runHidden(type, cds, repoName) {
   try {
@@ -173,13 +175,19 @@ const removeFiles = async(cds, repoName) => {
       const file = createsFiles[index];
       console.log(file)
       const filePath = path.join(createsPath, file);
-      await deleteFile(filePath);
+      const condition = existFile(filePath)
+      if(condition){
+        await deleteFile(filePath);
+      }  
     };
     for (let index = 0; index < triggersFiles.length; index++) {
       const file = triggersFiles[index];
       console.log(file)
       const filePath = path.join(triggersPath, file);
-      await deleteFile(filePath);
+      const condition = existFile(filePath)
+      if(condition){
+        await deleteFile(filePath);
+      }
     };
 
     await removeFromIndex(camelCase, "creates")
