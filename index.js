@@ -127,8 +127,8 @@ async function checkIftriggerOrAction(value, type) {
   }
 }
 
-const removeFromIndex = async (value, type) => {
-  const FILE_LOCATION = './dynamic-app/index.js'
+const removeFromIndex = async (value, type, repoName) => {
+  const FILE_LOCATION = `./${repoName}/index.js`
   
   const readRes = await readFile(FILE_LOCATION, "utf8");
   //console.log(readRes);
@@ -164,8 +164,8 @@ const removeFromIndex = async (value, type) => {
 const removeFiles = async(cds, repoName) => {
   try {
     console.log("running remove files")
-    const createsPath =  'dynamic-app/creates';
-    const triggersPath = 'dynamic-app/triggers';
+    const createsPath =  `${repoName}/creates`;
+    const triggersPath = `${repoName}/triggers`;
     let camelCase = cds.replace(/-/g, "_")
     
     const createsFiles = [`${camelCase}.js`];
@@ -190,8 +190,8 @@ const removeFiles = async(cds, repoName) => {
       }
     };
 
-    await removeFromIndex(camelCase, "creates")
-    await removeFromIndex(camelCase, "triggers")
+    await removeFromIndex(camelCase, "creates", repoName)
+    await removeFromIndex(camelCase, "triggers", repoName)
   }catch{
 
   }
