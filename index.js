@@ -320,8 +320,8 @@ app.post("/githubUpdate", async (req, res) => {
       await pushToZapier(repoName)
     }else if(branch == "master"){
       // {
-      //   "id": 175726,
-      //   "key": "App175726"
+      //   "id": 166926,
+      //   "key": "App166926"
       // }
       await replaceRCfile("production", repoName)
       await pushToZapier(repoName);
