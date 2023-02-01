@@ -175,7 +175,7 @@ const removeFiles = async(cds, repoName) => {
       const file = createsFiles[index];
       console.log(file)
       const filePath = path.join(createsPath, file);
-      const condition = existFile(filePath)
+      const condition = await existFile(filePath)
       if(condition){
         await deleteFile(filePath);
       }  
@@ -184,7 +184,7 @@ const removeFiles = async(cds, repoName) => {
       const file = triggersFiles[index];
       console.log(file)
       const filePath = path.join(triggersPath, file);
-      const condition = existFile(filePath)
+      const condition = await existFile(filePath)
       if(condition){
         await deleteFile(filePath);
       }
