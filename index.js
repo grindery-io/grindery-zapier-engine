@@ -363,7 +363,7 @@ async function sendNotification(version, branch, added, removed) {
     console.error(error);
   }
 }
-sendNotification("3.0.2", "staging", ["erc20"], ["evmWallet"])
+
 
 const pullRepository = (repository, repoName) => {
   let path = `./${repoName}`;
