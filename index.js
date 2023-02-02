@@ -243,6 +243,15 @@ const getLabel = async(element) =>{
     console.log("get label", error)
   }
 }
+
+const getVersion = async(repoName) => {
+  const data = await readFile(`./${repoName}/package.json`, 'utf8')
+  
+  const packageJson = JSON.parse(data);
+ 
+  return packageJson.version
+}
+
 app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload); //PRODUCTION
   //const value = req.body; //TESTING POSTMAN
@@ -316,6 +325,7 @@ app.post("/githubUpdate", async (req, res) => {
       //   "id": 174957,
       //   "key": "App174957"
       // }
+     
       await replaceRCfile("staging", repoName)
       await pushToZapier(repoName)
     }else if(branch == "master"){
@@ -326,8 +336,9 @@ app.post("/githubUpdate", async (req, res) => {
       await replaceRCfile("production", repoName)
       await pushToZapier(repoName);
     }
-  
-    //await sendNotification()
+    
+    const version = await getVersion(repoName)
+    await sendNotification(version, branch, added, removed)
     
     res.status(200).json({ res: "Done!" });
   } else {
@@ -338,17 +349,21 @@ app.post("/githubUpdate", async (req, res) => {
 });
 
 
-async function sendNotification() {
+async function sendNotification(version, branch, added, removed) {
   try {
+    const data = {
+      version, branch, added, removed
+    }
     const response = await axios.post(
-      "https://hooks.zapier.com/hooks/catch/92278/bjtiv8m/"
+      "https://hooks.zapier.com/hooks/catch/92278/bjtiv8m/",
+      data
     );
     console.log(response.data);
   } catch (error) {
     console.error(error);
   }
 }
-
+sendNotification("3.0.2", "staging", ["erc20"], ["evmWallet"])
 
 const pullRepository = (repository, repoName) => {
   let path = `./${repoName}`;
