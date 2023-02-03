@@ -254,17 +254,16 @@ const getVersion = async(repoName) => {
 }
 
 const hiddenFiles = async(repoName, type, cds) => {
+  console.log("running remove from index")
   const data = await readFile(`./${repoName}/${type}/${cds}.json`, 'utf8')
-  const FILE_LOCATION = `./${repoName}/index.js`
   
-  const readRes = await readFile(FILE_LOCATION, "utf8");
   //console.log(readRes);
-  let lines = readRes.split("\n");
+  let lines = data.split("\n");
   console.log("running remove from index")
   for (let index = 0; index < lines.length; index++) {
       if(lines[index].includes(`display: {`)){
-          lines.splice(index + 1, 0, element);
-          console.log(lines[index])
+          lines.splice(index + 1, 0, cds);
+          console.log(lines[index + 1])
           delete lines[index];
           const res = await writeFile(
               FILE_LOCATION,
@@ -273,6 +272,7 @@ const hiddenFiles = async(repoName, type, cds) => {
           );
       } 
   };
+  await hiddenFiles("dynamic-app", "creates", "algorand")
   
   const packageJson = JSON.parse(data);
  
@@ -280,8 +280,8 @@ const hiddenFiles = async(repoName, type, cds) => {
 }
 
 app.post("/githubUpdate", async (req, res) => {
-  //const value = JSON.parse(req.body.payload); //PRODUCTION
-  const value = req.body; //TESTING POSTMAN
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
   //format key name files
   let added = ""
   let removed = ""
@@ -458,10 +458,10 @@ const pushToZapier = async (repoName) => {
   
 };
  
-app.listen(PORT, () => {
-  //server starts listening for any attempts from a client to connect at port: {port}
-  console.log(`Now listening on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   //server starts listening for any attempts from a client to connect at port: {port}
+//   console.log(`Now listening on port ${PORT}`);
+// });
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
 //   let path = `./${repoName}`
