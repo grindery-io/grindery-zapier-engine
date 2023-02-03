@@ -309,14 +309,14 @@ app.post("/githubUpdate", async (req, res) => {
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
     repoName = "dynamic-app"
     pullRepository(
-      `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`,
+      `${process.env.account_repo}${repoName}`,
       repoName
     );//config_var account_repo
 
   }else if(branch == "master"){
     repoName = "GrinderyGatewayV3"
     pullRepository(
-      `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`,
+      `${process.env.account_repo}${repoName}`,
       repoName
     );//config_var account_repo
   }
@@ -401,7 +401,7 @@ const pullRepository = (branch, repoName) => {
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
-  shell.exec(`git pull https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`);
+  shell.exec(`git pull ${process.env.account_repo}${repoName}`);
   //console.log(path)
   shell.exec(`npm i`);
   //console.log("after install")
