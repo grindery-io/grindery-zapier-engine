@@ -252,6 +252,32 @@ const getVersion = async(repoName) => {
   return packageJson.version
 }
 
+const hiddenFiles = async(repoName, type, cds) => {
+  const data = await readFile(`./${repoName}/${type}/${cds}.json`, 'utf8')
+  const FILE_LOCATION = `./${repoName}/index.js`
+  
+  const readRes = await readFile(FILE_LOCATION, "utf8");
+  //console.log(readRes);
+  let lines = readRes.split("\n");
+  console.log("running remove from index")
+  for (let index = 0; index < lines.length; index++) {
+      if(lines[index].includes(`display: {`)){
+          lines.splice(index + 1, 0, element);
+          console.log(lines[index])
+          delete lines[index];
+          const res = await writeFile(
+              FILE_LOCATION,
+              lines.join("\n"),
+              "utf8"
+          );
+      } 
+  };
+  
+  const packageJson = JSON.parse(data);
+ 
+  return packageJson.version
+}
+
 app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload); //PRODUCTION
   //const value = req.body; //TESTING POSTMAN
@@ -264,8 +290,10 @@ app.post("/githubUpdate", async (req, res) => {
   if(value.commits[0].removed != undefined){
     removed = keyNames(value.commits[0].removed);
   }
-  console.log(value.commits[0].removed)
-  console.log(removed)
+  if(value.commits[0].removed != undefined){
+    modified = keyNames(value.commits[0].modified);
+  }
+  
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref); //get branch
   console.log(branch)
@@ -290,12 +318,12 @@ app.post("/githubUpdate", async (req, res) => {
     );
   }
   
-  if (added != undefined || removed != undefined) {
+  if (added != undefined || removed != undefined || modified != undefined) {
     //const added= ["erc20", "erc721", "gnosisSafe"]
 
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
-    console.log(removed)
+    
     if(removed != undefined){
       for (let index = 0; index < removed.length; index++) {
         const element = removed[index];
@@ -394,6 +422,7 @@ const updateVersion = (repoName) => {
 };
 const updateClient = () =>{
   shell.exec('npm update grindery-nexus-client')
+  shell.exec('npm view grindery-nexus-client version')
 }
 
 const pushToZapier = async (repoName) => {
