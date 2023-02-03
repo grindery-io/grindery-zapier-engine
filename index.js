@@ -351,24 +351,24 @@ app.post("/githubUpdate", async (req, res) => {
       }
     }
     console.log(branch)
-    // if(branch == "staging"){
-    //   // {
-    //   //   "id": 174957,
-    //   //   "key": "App174957"
-    //   // }
+    if(branch == "staging"){
+      // {
+      //   "id": 174957,
+      //   "key": "App174957"
+      // }
      
-    //   await replaceRCfile("staging", repoName)
-    //   await pushToZapier(repoName)
-    // }else if(branch == "master"){
-    //   // {
-    //   //   "id": 166926,
-    //   //   "key": "App166926"
-    //   // }
-    //   await replaceRCfile("production", repoName)
-    //   await pushToZapier(repoName);
-    // }
+      await replaceRCfile("staging", repoName)
+      await pushToZapier(repoName)
+    }else if(branch == "master"){
+      // {
+      //   "id": 166926,
+      //   "key": "App166926"
+      // }
+      await replaceRCfile("production", repoName)
+      await pushToZapier(repoName);
+    }
     
-    // const version = await getVersion(repoName)
+    const version = await getVersion(repoName)
     // await sendNotification(version, branch, added, removed)
     
     res.status(200).json({ res: "Done!" });
@@ -376,7 +376,6 @@ app.post("/githubUpdate", async (req, res) => {
     res.status(400).json({ res: "request again", payload: value });
   }
 
-  //pushDynamic("https://github.com/connex-clientaccess/${repoName}");
 });
 
 
