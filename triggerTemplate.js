@@ -278,7 +278,7 @@ module.exports = {
 
   display: {
     label: "replaceLabel",
-    description: "Triggers when replaceTriggerTitleCase Blockchain event occurs.",
+    description: "replaceDescription",
   },
 
   operation: {

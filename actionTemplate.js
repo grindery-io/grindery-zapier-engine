@@ -76,7 +76,7 @@ module.exports = {
 
   display: {
     label: "replaceLabelAction",
-    description: "Configure actions using replaceActionCamelCase directly in Zapier.",
+    description: "replaceDescription",
   },
 
   operation: {

@@ -52,7 +52,7 @@ async function runHidden(type, cds, repoName) {
   }
 }
 
-async function run(type, cds, repoName, label) {
+async function run(type, cds, repoName, label, description) {
   try {
     let data = {};
     let modified = {};
@@ -68,6 +68,7 @@ async function run(type, cds, repoName, label) {
       modified = modified.replace(/replaceTriggerTitleCase/g, titleCase);
       modified = modified.replace(/replaceTriggerCamelCase/g, camelCase);
       modified = modified.replace(/replaceLabel/g, label);
+      modified = modified.replace(/replaceDescription/g, description);
     } else {
       console.log("actions, ",titleCase)
       data = await readFile("actionTemplate.js", "utf8");
@@ -75,6 +76,7 @@ async function run(type, cds, repoName, label) {
       modified = modified.replace(/replaceActionTitleCase/g, titleCase);
       modified = modified.replace(/replaceActionCamelCase/g, camelCase);
       modified = modified.replace(/replaceLabelAction/g, label);
+      modified = modified.replace(/replaceDescription/g, description);
     }
     
     await writeFile(filePath, modified, "utf8");
@@ -230,7 +232,7 @@ const addToIndex = async (value, type, repoName) => {
   }
 };
 
-const getLabel = async(element) =>{
+const getLabelDescription = async(element) =>{
   try {
     //Trigger = 1, Action = 2 @Juan
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
@@ -238,8 +240,12 @@ const getLabel = async(element) =>{
     const fileContent = await readFile(filePath, "utf8"); // read the file
     
     const parseContent = JSON.parse(fileContent);
-    console.log(parseContent.name)
-    return parseContent.name
+    const data = {
+      name: parseContent.name,
+      description: parseContent.description
+    }
+    console.log(data)
+    return data
   }catch(error){
     console.log("get label", error)
   }
@@ -255,33 +261,30 @@ const getVersion = async(repoName) => {
 
 const hiddenFiles = async(repoName, type, cds) => {
   console.log("running remove from index")
-  const data = await readFile(`./${repoName}/${type}/${cds}.json`, 'utf8')
+  const FILE_LOCATION = `./${repoName}/${type}/${cds}.js`
+  const data = await readFile(FILE_LOCATION, 'utf8')
   
   //console.log(readRes);
   let lines = data.split("\n");
   console.log("running remove from index")
   for (let index = 0; index < lines.length; index++) {
       if(lines[index].includes(`display: {`)){
-          lines.splice(index + 1, 0, cds);
+          lines.splice(index + 2, 0, `    hidden: true,`);
+          
           console.log(lines[index + 1])
-          delete lines[index];
+         
           const res = await writeFile(
               FILE_LOCATION,
               lines.join("\n"),
               "utf8"
           );
       } 
-  };
-  await hiddenFiles("dynamic-app", "creates", "algorand")
-  
-  const packageJson = JSON.parse(data);
- 
-  return packageJson.version
+  }; 
 }
 
 app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
   //format key name files
   let added = ""
   let removed = ""
@@ -295,7 +298,8 @@ app.post("/githubUpdate", async (req, res) => {
   if(value.commits[0].modified != undefined){
     modified = keyNames(value.commits[0].modified);
   }
-  
+  added = added.concat(modified)
+  console.log(added)
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref); //get branch
   console.log(branch)
@@ -338,35 +342,35 @@ app.post("/githubUpdate", async (req, res) => {
         const element = added[index];
         const trigger = await checkIftriggerOrAction(element, 1);
         const action = await checkIftriggerOrAction(element, 2);
-        const label = await getLabel(element)
+        const info = await getLabelDescription(element)
         if (trigger) {
           await runHidden("triggers", element, repoName);
-          await run("triggers", element, repoName, label);
+          await run("triggers", element, repoName, info.name, info.description);
         }
         if (action) {
           //TO-DO
           await runHidden("creates", element, repoName);
-          await run("creates", element, repoName, label);
+          await run("creates", element, repoName, info.name, info.description);
         }
       }
     }
     console.log(branch)
-    if(branch == "staging"){
-      // {
-      //   "id": 174957,
-      //   "key": "App174957"
-      // }
+    // if(branch == "staging"){
+    //   // {
+    //   //   "id": 174957,
+    //   //   "key": "App174957"
+    //   // }
      
-      await replaceRCfile("staging", repoName)
-      await pushToZapier(repoName)
-    }else if(branch == "master"){
-      // {
-      //   "id": 166926,
-      //   "key": "App166926"
-      // }
-      await replaceRCfile("production", repoName)
-      await pushToZapier(repoName);
-    }
+    //   await replaceRCfile("staging", repoName)
+    //   await pushToZapier(repoName)
+    // }else if(branch == "master"){
+    //   // {
+    //   //   "id": 166926,
+    //   //   "key": "App166926"
+    //   // }
+    //   await replaceRCfile("production", repoName)
+    //   await pushToZapier(repoName);
+    // }
     
     const version = await getVersion(repoName)
     // await sendNotification(version, branch, added, removed)
@@ -458,10 +462,10 @@ const pushToZapier = async (repoName) => {
   
 };
  
-// app.listen(PORT, () => {
-//   //server starts listening for any attempts from a client to connect at port: {port}
-//   console.log(`Now listening on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+  //server starts listening for any attempts from a client to connect at port: {port}
+  console.log(`Now listening on port ${PORT}`);
+});
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
 //   let path = `./${repoName}`
