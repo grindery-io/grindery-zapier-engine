@@ -265,20 +265,22 @@ app.post("/githubUpdate", async (req, res) => {
   //Pull repositories
   pullSchema(
     "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
-  );
+  ); //config_var
+
   if(branch == "staging"){
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
     repoName = "dynamic-app"
     pullRepository(
-      `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`,
+      `${process.env.account_repo}${repoName}`,
       repoName
-    );  
+    );//config_var account_repo
+
   }else if(branch == "master"){
     repoName = "GrinderyGatewayV3"
     pullRepository(
-      `https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`,
+      `${process.env.account_repo}${repoName}`,
       repoName
-    );
+    );//config_var account_repo
   }
   
   if (added != undefined || removed != undefined) {
@@ -356,7 +358,7 @@ const pullRepository = (repository, repoName) => {
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
-  shell.exec(`git pull https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`);
+  shell.exec(`git pull ${process.env.account_repo}${repoName}`); //config_var
   //console.log(path)
   shell.exec(`npm i`);
   //console.log("after install")
@@ -389,20 +391,20 @@ const pushToZapier = async (repoName) => {
   updateClient()
   //STOP GITHUB PUSH 
   shell.exec("git init");
-  shell.exec(`git config user.email clientaccess@connex.digital`);
-  shell.exec(`git config user.name connex-clientaccess`);
+  shell.exec(`git config user.email clientaccess@connex.digital`); //config_var
+  shell.exec(`git config user.name connex-clientaccess`); //config_var
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
-    `git push https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`
-  );
+    `git push ${process.env.account_repo}${repoName}`
+  ); //config_var
   //Until here
   console.log("after update version");
   shell.cd("..");
-  if(repoName == "GrinderyGatewayV3"){
-    shell.exec(`npm run pushgateway`);
-  }else if(repoName == "dynamic-app"){
-    shell.exec(`npm run pushdynamic`);
+  if(repoName == "GrinderyGatewayV3"){ //config_var
+    shell.exec(`npm run pushgateway`); 
+  }else if(repoName == "dynamic-app"){ //config_var
+    shell.exec(`npm run pushdynamic`); 
   }
   //shell.exec('npm run pushdynamicLink')
   
