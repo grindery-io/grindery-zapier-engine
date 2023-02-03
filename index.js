@@ -284,6 +284,7 @@ app.post("/githubUpdate", async (req, res) => {
   //format key name files
   let added = ""
   let removed = ""
+  let modified = ""
   if(value.commits[0].added != undefined){
     added = keyNames(value.commits[0].added); //get key names'
   }
