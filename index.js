@@ -201,6 +201,7 @@ const addToIndex = async (value, type, repoName) => {
   let counter = 18;
   // Read the contents of the file
   try {
+    await removeFromIndex(value, type, repoName)
     const readRes = await readFile(`./${repoName}/index.js`, "utf8");
    
     let lines = readRes.split("\n");
@@ -279,8 +280,8 @@ const hiddenFiles = async(repoName, type, cds) => {
 }
 
 app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
   //format key name files
   let added = ""
   let removed = ""
@@ -291,7 +292,7 @@ app.post("/githubUpdate", async (req, res) => {
   if(value.commits[0].removed != undefined){
     removed = keyNames(value.commits[0].removed);
   }
-  if(value.commits[0].removed != undefined){
+  if(value.commits[0].modified != undefined){
     modified = keyNames(value.commits[0].modified);
   }
   
@@ -302,7 +303,8 @@ app.post("/githubUpdate", async (req, res) => {
 
   //Pull repositories
   pullSchema(
-    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2"
+    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2",
+    branch
   );
   if(branch == "staging"){
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
@@ -349,25 +351,25 @@ app.post("/githubUpdate", async (req, res) => {
       }
     }
     console.log(branch)
-    if(branch == "staging"){
-      // {
-      //   "id": 174957,
-      //   "key": "App174957"
-      // }
+    // if(branch == "staging"){
+    //   // {
+    //   //   "id": 174957,
+    //   //   "key": "App174957"
+    //   // }
      
-      await replaceRCfile("staging", repoName)
-      await pushToZapier(repoName)
-    }else if(branch == "master"){
-      // {
-      //   "id": 166926,
-      //   "key": "App166926"
-      // }
-      await replaceRCfile("production", repoName)
-      await pushToZapier(repoName);
-    }
+    //   await replaceRCfile("staging", repoName)
+    //   await pushToZapier(repoName)
+    // }else if(branch == "master"){
+    //   // {
+    //   //   "id": 166926,
+    //   //   "key": "App166926"
+    //   // }
+    //   await replaceRCfile("production", repoName)
+    //   await pushToZapier(repoName);
+    // }
     
-    const version = await getVersion(repoName)
-    await sendNotification(version, branch, added, removed)
+    // const version = await getVersion(repoName)
+    // await sendNotification(version, branch, added, removed)
     
     res.status(200).json({ res: "Done!" });
   } else {
@@ -401,7 +403,7 @@ const pullRepository = (branch, repoName) => {
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
   shell.exec(`git pull https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}`);
-  shell.exec(`git checkout ${branch}`)
+  
   //console.log(path)
   shell.exec(`npm i`);
   //console.log("after install")
@@ -410,10 +412,13 @@ const pullRepository = (branch, repoName) => {
   //console.log("back to root folder")
   //shell.exec(`dir .`)
 };
-const pullSchema = (repository) => {
+
+const pullSchema = (repository, branch) => {
   shell.cd("./grindery-nexus-schema-v2");
   shell.exec("git init");
+  
   shell.exec(`git pull ${repository}`);
+  shell.exec(`git switch ${branch}`)
   shell.cd("..");
 };
 
