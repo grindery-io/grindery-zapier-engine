@@ -432,8 +432,9 @@ const pullRepository = (branch, repoName) => {
   shell.exec(`git pull ${process.env.account_repo}${repoName}`);
   //console.log(path)
   shell.exec(`npm i`);
-  //console.log("after install")
-  //shell.exec(`dir .`)
+  console.log(`${process.env.account_repo}${repoName}`)
+  shell.exec(`dir .`)
+
   shell.cd(".."); //back to index
   //console.log("back to root folder")
   //shell.exec(`dir .`)
