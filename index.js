@@ -4,7 +4,7 @@ import bp from "body-parser";
 import fs from "fs"; //write read files
 import axios from "axios"; //call endpoint
 import util from "util"; //use promises for fs library
-import path from "path"
+import path, { parse } from "path"
 import { keyNames, getBranch } from "./src/Utilities.js";
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
@@ -232,7 +232,7 @@ const addToIndex = async (value, type, repoName) => {
   }
 };
 
-const getLabelDescription = async(element) =>{
+const getLabelDescription = async(element, type) =>{
   try {
     //Trigger = 1, Action = 2 @Juan
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
@@ -241,17 +241,28 @@ const getLabelDescription = async(element) =>{
     let description = ""
     
     const parseContent = JSON.parse(fileContent);
-    
-    if(parseContent.description != undefined && parseContent.description != ""){
-      if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
-        description = parseContent.description
+    if(type == "trigger"){
+      if(parseContent.description != undefined && parseContent.description != ""){
+        if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+          description = parseContent.description
+        }else{
+          description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
+        }
       }else{
         description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
       }
     }else{
-      description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
+      if(parseContent.description != undefined && parseContent.description != ""){
+        if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+          description = `Configure actions using ${parseContent.name} directly in Zapier.`
+        }else{
+          description = `Configure actions using ${parseContent.name} directly in Zapier.`
+        }
+      }else{
+        description = `Configure actions using ${parseContent.name} directly in Zapier.`
+      }
     }
-    
+
     const data = {
       name: parseContent.name,
       description: description
@@ -354,15 +365,16 @@ app.post("/githubUpdate", async (req, res) => {
         const element = added[index];
         const trigger = await checkIftriggerOrAction(element, 1);
         const action = await checkIftriggerOrAction(element, 2);
-        const info = await getLabelDescription(element)
+        const infoTrigger = await getLabelDescription(element, "trigger")
+        const infoAction = await getLabelDescription(element, "action")
         if (trigger) {
           await runHidden("triggers", element, repoName);
-          await run("triggers", element, repoName, info.name, info.description);
+          await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
         }
         if (action) {
           //TO-DO
           await runHidden("creates", element, repoName);
-          await run("creates", element, repoName, info.name, info.description);
+          await run("creates", element, repoName, infoAction.name, infoAction.description);
         }
       }
     }
