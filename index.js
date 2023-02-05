@@ -241,13 +241,17 @@ const getLabelDescription = async(element) =>{
     let description = ""
     
     const parseContent = JSON.parse(fileContent);
-
-    if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
-      description = parseContent.description
+    
+    if(parseContent.description != undefined && parseContent.description != ""){
+      if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+        description = parseContent.description
+      }else{
+        description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
+      }
     }else{
       description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
     }
-
+    
     const data = {
       name: parseContent.name,
       description: description
