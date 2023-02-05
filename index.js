@@ -242,10 +242,10 @@ const getLabelDescription = async(element) =>{
     
     const parseContent = JSON.parse(fileContent);
 
-    if(parseContent.description.includes("Triggers when") || parseContent.description.includes(".")){
-      description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
-    }else{
+    if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
       description = parseContent.description
+    }else{
+      description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
     }
 
     const data = {
