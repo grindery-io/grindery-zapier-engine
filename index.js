@@ -238,11 +238,19 @@ const getLabelDescription = async(element) =>{
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
    
     const fileContent = await readFile(filePath, "utf8"); // read the file
+    let description = ""
     
     const parseContent = JSON.parse(fileContent);
+
+    if(parseContent.description.includes("Triggers when") || parseContent.description.includes(".")){
+      description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
+    }else{
+      description = parseContent.description
+    }
+
     const data = {
       name: parseContent.name,
-      description: parseContent.description
+      description: description
     }
     console.log(data)
     return data
