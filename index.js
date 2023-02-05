@@ -483,11 +483,11 @@ const pushToZapier = async (repoName) => {
   ); //config_var
   //Until here
   console.log("after update version");
-  //shell.cd("..");
+  shell.cd("..");
   if(repoName == "GrinderyGatewayV3"){ //config_var
-    
+    shell.cd("./GrinderyGatewayV3");
     shell.exec(`zapier push`); 
-    shell.exec(`zapier promote ${version}`); 
+    shell.exec(`zapier promote ${version} -y`); 
     shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
   }else if(repoName == "dynamic-app"){ //config_var
