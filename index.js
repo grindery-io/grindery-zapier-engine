@@ -397,7 +397,7 @@ app.post("/githubUpdate", async (req, res) => {
     }
     
     const version = await getVersion(repoName)
-    await sendNotification(version, branch, added, removed)
+    //await sendNotification(version, branch, added, removed)
     
     res.status(200).json({ res: "Done!" });
   } else {
@@ -429,7 +429,7 @@ const pullRepository = (branch, repoName) => {
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
-  shell.exec(`git pull ${process.env.account_repo}${repoName}`);
+  shell.exec(`git pull ${process.env.account_repo}${repoName} master`);
   //console.log(path)
   shell.exec(`npm i`);
   console.log(`${process.env.account_repo}${repoName}`)
