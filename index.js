@@ -6,6 +6,8 @@ import axios from "axios"; //call endpoint
 import util from "util"; //use promises for fs library
 import path, { parse } from "path"
 import { keyNames, getBranch } from "./src/Utilities.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
 
@@ -397,7 +399,7 @@ app.post("/githubUpdate", async (req, res) => {
     }
     
     const version = await getVersion(repoName)
-    //await sendNotification(version, branch, added, removed)
+    await sendNotification(version, branch, added, removed)
     
     res.status(200).json({ res: "Done!" });
   } else {
@@ -461,6 +463,11 @@ const updateClient = () =>{
 const pushToZapier = async (repoName) => {
   console.log("root folder");
   shell.exec("dir .");
+  const version = await getVersion(repoName)
+  let lastversion = version.replace(/(\d+)\.(\d+)\.(\d+)/, function(match, p1, p2, p3) {
+    p3 = parseInt(p3) - 1;
+    return p1 + '.' + p2 + '.' + p3;
+  });
   //shell.cd("..")
   console.log("after");
   updateVersion(repoName); //update version before pushing to zapier
@@ -476,16 +483,21 @@ const pushToZapier = async (repoName) => {
   ); //config_var
   //Until here
   console.log("after update version");
-  shell.cd("..");
+  //shell.cd("..");
   if(repoName == "GrinderyGatewayV3"){ //config_var
-    shell.exec(`npm run pushgateway`); 
+    
+    shell.exec(`zapier push`); 
+    shell.exec(`zapier promote ${version}`); 
+    shell.exec(`zapier migrate ${version} ${lastversion}`); 
+    
   }else if(repoName == "dynamic-app"){ //config_var
+    process.env.version = await getVersion(repoName)
     shell.exec(`npm run pushdynamic`); 
   }
   //shell.exec('npm run pushdynamicLink')
   
 };
- 
+
 app.listen(PORT, () => {
   //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${PORT}`);
