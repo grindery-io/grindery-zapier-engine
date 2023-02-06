@@ -488,7 +488,7 @@ const pushToZapier = async (repoName) => {
     shell.cd("./GrinderyGatewayV3");
     shell.exec(`zapier push`); 
     shell.exec(`zapier promote ${version} -y`); 
-    //shell.exec(`zapier migrate ${version} ${lastversion}`); 
+    shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
   }else if(repoName == "dynamic-app"){ //config_var
     process.env.version = await getVersion(repoName)
