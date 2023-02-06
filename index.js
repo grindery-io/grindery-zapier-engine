@@ -463,9 +463,9 @@ const updateClient = () =>{
 const pushToZapier = async (repoName) => {
   console.log("root folder");
   shell.exec("dir .");
-  const version = await getVersion(repoName)
-  let lastversion = version.replace(/(\d+)\.(\d+)\.(\d+)/, function(match, p1, p2, p3) {
-    p3 = parseInt(p3) - 1;
+  const lastversion = await getVersion(repoName)
+  let version = lastversion.replace(/(\d+)\.(\d+)\.(\d+)/, function(match, p1, p2, p3) {
+    p3 = parseInt(p3) + 1;
     return p1 + '.' + p2 + '.' + p3;
   });
   //shell.cd("..")
