@@ -3,7 +3,6 @@
     "start": "node index.js",
     "pushtozapier": "cd ./PokeApi && zapier push",
     "pushdynamic": "cd ./dynamic-app && zapier push",
-    "pushgateway": "cd ./GrinderyGatewayV3 && zapier push && zapier promote version=process.env.version -y && zapier migrate version=process.env.version lastversion=process.env.lastversion",
     "pushdynamicLink": "cd ./dynamic-app && zapier link",
     "login": "echo 9f4c03fa427d81d0ee85dcc69abab093 | zapier login --sso ",
     "simplelogin": "zapier login --sso ",

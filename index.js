@@ -336,14 +336,14 @@ app.post("/githubUpdate", async (req, res) => {
   );
   if(branch == "staging"){
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
-    repoName = "dynamic-app"
+    repoName = `${process.env.staging_name}` //config_var
     pullRepository(
       `${process.env.account_repo}${repoName}`,
       repoName
     );//config_var account_repo
 
   }else if(branch == "master"){
-    repoName = "GrinderyGatewayV3"
+    repoName = `${process.env.production_name}` //config_var
     pullRepository(
       `${process.env.account_repo}${repoName}`,
       repoName
@@ -474,23 +474,23 @@ const pushToZapier = async (repoName) => {
   updateClient()
   //STOP GITHUB PUSH 
   shell.exec("git init");
-  shell.exec(`git config user.email clientaccess@connex.digital`); //config_var
-  shell.exec(`git config user.name connex-clientaccess`); //config_var
+  shell.exec(`git config user.email ${process.env.gitHub_email}`); //config_var
+  shell.exec(`git config user.name ${process.env.gitHub_username}`); //config_var
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
     `git push ${process.env.account_repo}${repoName}`
-  ); //config_var
+  );
   //Until here
   console.log("after update version");
   shell.cd("..");
-  if(repoName == "GrinderyGatewayV3"){ //config_var
-    shell.cd("./GrinderyGatewayV3");
+  if(repoName == `${process.env.production_name}`){ //config_var
+    shell.cd(`./${process.env.production_name}`);
     shell.exec(`zapier push`); 
     shell.exec(`zapier promote ${version} -y`); 
     shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
-  }else if(repoName == "dynamic-app"){ //config_var
+  }else if(repoName == `${process.env.staging_name}`){ //config_var
     process.env.version = await getVersion(repoName)
     shell.exec(`npm run pushdynamic`); 
   }
