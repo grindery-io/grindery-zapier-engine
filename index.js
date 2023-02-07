@@ -339,7 +339,7 @@ const importantFile = async(filePath) => {
       } 
   }; 
 }
-await importantFile(`./dynamic-app/triggers/evmWallet.js`)
+
 app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload); //PRODUCTION
   //const value = req.body; //TESTING POSTMAN
