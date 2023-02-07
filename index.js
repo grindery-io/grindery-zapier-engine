@@ -83,14 +83,14 @@ async function run(type, cds, repoName, label, description) {
     
     await writeFile(filePath, modified, "utf8");
     await addToIndex(camelCase, type, repoName);
-    if(campelCase == "evmWallet"){
+    if(camelCase == "evmWallet"){
       await importantFile(filePath)
     }
-    
   } catch (error) {
     console.log("run ", error);
   }
 }
+
 async function replaceRCfile(type, repoName) {
   try {
     let data = {};
@@ -302,7 +302,6 @@ const hiddenFiles = async(filePath) => {
   
   //console.log(readRes);
   let lines = data.split("\n");
-  console.log("running remove from index")
   for (let index = 0; index < lines.length; index++) {
       if(lines[index].includes(`display: {`)){
           lines.splice(index + 2, 0, `    hidden: true,`);
@@ -319,13 +318,13 @@ const hiddenFiles = async(filePath) => {
 }
 
 const importantFile = async(filePath) => {
-  console.log("running hidden from index")
+  console.log("running important file from index")
   const FILE_LOCATION = filePath // `./${repoName}/${type}/${cds}.js`
   const data = await readFile(FILE_LOCATION, 'utf8')
   
   //console.log(readRes);
   let lines = data.split("\n");
-  console.log("running remove from index")
+
   for (let index = 0; index < lines.length; index++) {
       if(lines[index].includes(`display: {`)){
           lines.splice(index + 2, 0, `    important: true,`);
@@ -340,7 +339,7 @@ const importantFile = async(filePath) => {
       } 
   }; 
 }
-
+await importantFile(`./dynamic-app/triggers/evmWallet.js`)
 app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload); //PRODUCTION
   //const value = req.body; //TESTING POSTMAN
