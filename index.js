@@ -83,6 +83,10 @@ async function run(type, cds, repoName, label, description) {
     
     await writeFile(filePath, modified, "utf8");
     await addToIndex(camelCase, type, repoName);
+    if(campelCase == "evmWallet"){
+      await importantFile(filePath)
+    }
+    
   } catch (error) {
     console.log("run ", error);
   }
@@ -314,6 +318,29 @@ const hiddenFiles = async(filePath) => {
   }; 
 }
 
+const importantFile = async(filePath) => {
+  console.log("running hidden from index")
+  const FILE_LOCATION = filePath // `./${repoName}/${type}/${cds}.js`
+  const data = await readFile(FILE_LOCATION, 'utf8')
+  
+  //console.log(readRes);
+  let lines = data.split("\n");
+  console.log("running remove from index")
+  for (let index = 0; index < lines.length; index++) {
+      if(lines[index].includes(`display: {`)){
+          lines.splice(index + 2, 0, `    important: true,`);
+          
+          console.log(lines[index + 1])
+         
+          const res = await writeFile(
+              FILE_LOCATION,
+              lines.join("\n"),
+              "utf8"
+          );
+      } 
+  }; 
+}
+
 app.post("/githubUpdate", async (req, res) => {
   const value = JSON.parse(req.body.payload); //PRODUCTION
   //const value = req.body; //TESTING POSTMAN
@@ -384,7 +411,7 @@ app.post("/githubUpdate", async (req, res) => {
           await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
           counter++
         }
-        if (action && infoTrigger.access == true) {
+        if (action && infoAction.access == true) {
           //TO-DO
           await runHidden("creates", element, repoName);
           await run("creates", element, repoName, infoAction.name, infoAction.description);
@@ -409,7 +436,7 @@ app.post("/githubUpdate", async (req, res) => {
       await replaceRCfile("production", repoName)
       await pushToZapier(repoName);
     }
-    if(branch == "master" && counter > 0){
+    if(branch == "master" && counter == 0){
 
     }else{
       const version = await getVersion(repoName)
