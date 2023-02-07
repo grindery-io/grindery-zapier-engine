@@ -409,9 +409,12 @@ app.post("/githubUpdate", async (req, res) => {
       await replaceRCfile("production", repoName)
       await pushToZapier(repoName);
     }
-    
-    const version = await getVersion(repoName)
-    await sendNotification(version, branch, added, removed)
+    if(branch == "master" && counter > 0){
+
+    }else{
+      const version = await getVersion(repoName)
+      await sendNotification(version, branch, added, removed)
+    }
     
     res.status(200).json({ res: "Done!" });
   } else {
