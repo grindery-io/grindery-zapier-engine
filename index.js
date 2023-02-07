@@ -234,13 +234,14 @@ const addToIndex = async (value, type, repoName) => {
   }
 };
 
-const getLabelDescription = async(element, type) =>{
+const getLabelDescriptionAccess = async(element, type, branch) =>{
   try {
     //Trigger = 1, Action = 2 @Juan
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
    
     const fileContent = await readFile(filePath, "utf8"); // read the file
     let description = ""
+    let access = true
     
     const parseContent = JSON.parse(fileContent);
     if(type == "trigger"){
@@ -264,10 +265,16 @@ const getLabelDescription = async(element, type) =>{
         description = `Configure actions using ${parseContent.name} directly in Zapier.`
       }
     }
+    if(parseContent.access == undefined || parseContent.access == "Public" ||  parseContent.access == "" || branch == "staging"){
+      access = true
+    }else{
+      access = false
+    }
 
     const data = {
       name: parseContent.name,
-      description: description
+      description: description,
+      access: access
     }
     console.log(data)
     return data
@@ -356,11 +363,13 @@ app.post("/githubUpdate", async (req, res) => {
 
     // const removed = keyNames(value.commits[0].removed);
     // console.log(removed);
+    let counter = 0;
     
     if(removed != undefined){
       for (let index = 0; index < removed.length; index++) {
         const element = removed[index];
         await removeFiles(element, repoName)
+        counter++
       }
     }
     if(added != undefined){
@@ -368,16 +377,18 @@ app.post("/githubUpdate", async (req, res) => {
         const element = added[index];
         const trigger = await checkIftriggerOrAction(element, 1);
         const action = await checkIftriggerOrAction(element, 2);
-        const infoTrigger = await getLabelDescription(element, "trigger")
-        const infoAction = await getLabelDescription(element, "action")
-        if (trigger) {
+        const infoTrigger = await getLabelDescriptionAccess(element, "trigger", branch)
+        const infoAction = await getLabelDescriptionAccess(element, "action", branch)
+        if (trigger && infoTrigger.access == true) {
           await runHidden("triggers", element, repoName);
           await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
+          counter++
         }
-        if (action) {
+        if (action && infoTrigger.access == true) {
           //TO-DO
           await runHidden("creates", element, repoName);
           await run("creates", element, repoName, infoAction.name, infoAction.description);
+          counter++
         }
       }
     }
@@ -390,7 +401,7 @@ app.post("/githubUpdate", async (req, res) => {
      
       await replaceRCfile("staging", repoName)
       await pushToZapier(repoName)
-    }else if(branch == "master"){
+    }else if(branch == "master" && counter > 0){
       // {
       //   "id": 166926,
       //   "key": "App166926"
