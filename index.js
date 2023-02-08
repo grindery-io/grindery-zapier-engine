@@ -340,9 +340,7 @@ const importantFile = async(filePath) => {
   }; 
 }
 
-app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+async function runPayload(value){
   //format key name files
   let added = ""
   let removed = ""
@@ -441,12 +439,15 @@ app.post("/githubUpdate", async (req, res) => {
       const version = await getVersion(repoName)
       await sendNotification(version, branch, added, removed)
     }
-    
-    res.status(200).json({ res: "Done!" });
-  } else {
-    res.status(400).json({ res: "request again", payload: value });
   }
+}
 
+app.post("/githubUpdate", async (req, res) => {
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
+
+  runPayload(value);
+  res.status(200).json({ res: "Payload Received successfully. Processing..." });
 });
 
 
