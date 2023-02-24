@@ -193,6 +193,7 @@ const subscribeHook = async (z, bundle) => {
             creator: creator,
             actions: action,
             trigger: trigger,
+            source: "urn:grindery:zapier-gateway",
           };
 
           //z.console.log("Workflow Object: ", workflow);
