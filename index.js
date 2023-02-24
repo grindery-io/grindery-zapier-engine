@@ -241,6 +241,7 @@ const addToIndex = async (value, type, repoName) => {
 const getLabelDescriptionAccess = async(element, type, branch) =>{
   try {
     //Trigger = 1, Action = 2 @Juan
+    const deployToStaging = false; //if access = Beta || access property is undefined
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
    
     const fileContent = await readFile(filePath, "utf8"); // read the file
@@ -269,17 +270,20 @@ const getLabelDescriptionAccess = async(element, type, branch) =>{
         description = `Configure actions using ${parseContent.name} directly in Zapier.`
       }
     }
-    if(parseContent.access == undefined || parseContent.access == "Public" ||  parseContent.access == "" || branch == "staging"){
+    if(parseContent.access != undefined && parseContent.access == "Public"){
       access = true
-    }else{
-      access = false
+    }
+    if(parseContent.access == undefined || parseContent.access == "Beta"){
+      deployToStaging = true;
     }
 
     const data = {
       name: parseContent.name,
       description: description,
-      access: access
+      access: access,
+      deployToStaging: deployToStaging
     }
+
     console.log(data)
     return data
   }catch(error){
@@ -360,13 +364,10 @@ async function runPayload(value){
   const branch = getBranch(value.ref); //get branch
   console.log(branch)
   let repoName = ""
+  let staging_repoName = ""
 
-  //Pull repositories
-  pullSchema(
-    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2",
-    branch
-  );
-  if(branch == "staging"){
+  //remove conditionals & repo
+  /*if(branch == "staging"){
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
     repoName = `${process.env.staging_name}` //config_var
     pullRepository(
@@ -374,70 +375,96 @@ async function runPayload(value){
       repoName
     );//config_var account_repo
 
-  }else if(branch == "master"){
-    repoName = `${process.env.production_name}` //config_var
-    pullRepository(
-      `${process.env.account_repo}${repoName}`,
-      repoName
-    );//config_var account_repo
-  }
+  }else */
+  if(branch == "master"){
+      //Pull repositories
+    pullSchema(
+      "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2",
+      "master"
+    );
+    //move items here
+    const infoAction = {};
+    if (added != undefined || removed != undefined || modified != undefined) {
+      //const added= ["erc20", "erc721", "gnosisSafe"]
   
-  if (added != undefined || removed != undefined || modified != undefined) {
-    //const added= ["erc20", "erc721", "gnosisSafe"]
-
-    // const removed = keyNames(value.commits[0].removed);
-    // console.log(removed);
-    let counter = 0;
-    
-    if(removed != undefined){
-      for (let index = 0; index < removed.length; index++) {
-        const element = removed[index];
-        await removeFiles(element, repoName)
-        counter++
-      }
-    }
-    if(added != undefined){
-      for (let index = 0; index < added.length; index++) {
-        const element = added[index];
-        const trigger = await checkIftriggerOrAction(element, 1);
-        const action = await checkIftriggerOrAction(element, 2);
-        const infoTrigger = await getLabelDescriptionAccess(element, "trigger", branch)
-        const infoAction = await getLabelDescriptionAccess(element, "action", branch)
-        if (trigger && infoTrigger.access == true) {
-          await runHidden("triggers", element, repoName);
-          await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
-          counter++
-        }
-        if (action && infoAction.access == true) {
-          //TO-DO
-          await runHidden("creates", element, repoName);
-          await run("creates", element, repoName, infoAction.name, infoAction.description);
-          counter++
+      // const removed = keyNames(value.commits[0].removed);
+      // console.log(removed);
+      let master_counter = 0;
+      let staging_counter = 0;
+      
+      //removed limitation - if no branches
+      if(removed != undefined){
+        for (let index = 0; index < removed.length; index++) {
+          const element = removed[index];
+          await removeFiles(element, repoName)
+          master_counter++
         }
       }
-    }
-    console.log(branch)
-    if(branch == "staging"){
-      // {
-      //   "id": 174957,
-      //   "key": "App174957"
-      // }
-     
-      await replaceRCfile("staging", repoName)
-      await pushToZapier(repoName)
-    }else if(branch == "master" && counter > 0){
-      // {
-      //   "id": 166926,
-      //   "key": "App166926"
-      // }
-      await replaceRCfile("production", repoName)
-      await pushToZapier(repoName);
-    }
-    if(branch == "master" && counter == 0){
 
-    }else{
-      const version = await getVersion(repoName)
-      await sendNotification(version, branch, added, removed)
+      if(added != undefined){
+
+        repoName = `${process.env.production_name}` //config_var
+        pullRepository(
+          `${process.env.account_repo}${repoName}`,
+          repoName
+        );//config_var account_repo
+
+        staging_repoName = `${process.env.staging_name}` //config_var
+        pullRepository(
+          `${process.env.account_repo}${staging_repoName}`,
+          staging_repoName
+        );//config_var account_repo
+        
+        for (let index = 0; index < added.length; index++) {
+          const element = added[index];
+          const trigger = await checkIftriggerOrAction(element, 1);
+          const action = await checkIftriggerOrAction(element, 2);
+          const infoTrigger = await getLabelDescriptionAccess(element, "trigger", branch)
+          const infoAction = await getLabelDescriptionAccess(element, "action", branch)
+          if (trigger) {
+            if(infoTrigger.access == true){
+
+              await runHidden("triggers", element, repoName);
+              await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
+              master_counter++
+            }
+            if(infoTrigger.access == false && infoTrigger.deployToStaging == true){
+
+              await runHidden("triggers", element, staging_repoName);
+              await run("triggers", element, staging_repoName, infoTrigger.name, infoTrigger.description);
+              staging_counter++
+            }
+          }
+          if (action) {
+            if(infoAction.access == true){
+            //TO-DO
+            await runHidden("creates", element, repoName);
+            await run("creates", element, repoName, infoAction.name, infoAction.description);
+            master_counter++
+            }
+            if(infoAction.access == false && infoAction.deployToStaging == true){
+              await runHidden("creates", element, staging_repoName);
+              await run("creates", element, staging_repoName, infoAction.name, infoAction.description);
+              staging_counter++
+            }
+          }
+        }
+      }
+      //console.log(branch)
+      if(staging_counter > 0){
+
+        await replaceRCfile("staging", staging_repoName)
+        await pushToZapier(staging_repoName)
+
+      }else if(master_counter > 0){
+
+        await replaceRCfile("production", repoName)
+        await pushToZapier(repoName);
+
+        const version = await getVersion(repoName)
+        await sendNotification(version, branch, added, removed)
+
+      }
     }
   }
 }
