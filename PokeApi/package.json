@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "pushtozapier": "cd ./Pokeapi/poke-api && zapier push"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "shelljs": "^0.8.5"
+    }
+}
