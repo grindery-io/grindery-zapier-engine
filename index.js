@@ -450,28 +450,28 @@ async function runPayload(value){
           }
         }
       }
-      //console.log(branch)
-      if(staging_counter > 0){
+      console.log(staging_counter, master_counter)
+      // if(staging_counter > 0){
 
-        await replaceRCfile("staging", staging_repoName)
-        await pushToZapier(staging_repoName)
+      //   await replaceRCfile("staging", staging_repoName)
+      //   await pushToZapier(staging_repoName)
 
-      }else if(master_counter > 0){
+      // }else if(master_counter > 0){
 
-        await replaceRCfile("production", repoName)
-        await pushToZapier(repoName);
+      //   await replaceRCfile("production", repoName)
+      //   await pushToZapier(repoName);
 
-        const version = await getVersion(repoName)
-        await sendNotification(version, branch, added, removed)
+      //   const version = await getVersion(repoName)
+      //   await sendNotification(version, branch, added, removed)
 
-      }
+      // }
     }
   }
 }
 
 app.post("/githubUpdate", async (req, res) => {
-  const value = JSON.parse(req.body.payload); //PRODUCTION
-  //const value = req.body; //TESTING POSTMAN
+  //const value = JSON.parse(req.body.payload); //PRODUCTION
+  const value = req.body; //TESTING POSTMAN
 
   runPayload(value);
   res.status(200).json({ res: "Payload Received successfully. Processing..." });
