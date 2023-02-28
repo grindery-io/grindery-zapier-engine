@@ -454,13 +454,14 @@ async function runPayload(value){
         //Update all files in schema 
         const allFiles = await pullAllFiles()
         for (let index = 0; index < allFiles.length; index++) {
+          
           const element = allFiles[index];
           const trigger = await checkIftriggerOrAction(element, 1);
           const action = await checkIftriggerOrAction(element, 2);
           const infoTrigger = await getLabelDescriptionAccess(element, "trigger")
           const infoAction = await getLabelDescriptionAccess(element, "action")
           console.log(infoTrigger)
-          if (trigger) {
+          if (trigger && element.length > 1) {
             if(infoTrigger.access == true){
 
               await runHidden("triggers", element, repoName);
@@ -472,7 +473,7 @@ async function runPayload(value){
               await run("triggers", element, staging_repoName, infoTrigger.name, infoTrigger.description);
             }
           }
-          if (action) {
+          if (action && element.length > 1) {
             if(infoAction.access == true){
             //TO-DO
             await runHidden("creates", element, repoName);
