@@ -537,10 +537,11 @@ const pullRepository = (branch, repoName) => {
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
-  shell.exec(`git pull ${process.env.account_repo}${repoName} master`);
+  console.log(`${process.env.account_repo}${repoName}`)
+  shell.exec(`git pull ${process.env.account_repo}${repoName}`);
   //console.log(path)
   shell.exec(`npm i`);
-  console.log(`${process.env.account_repo}${repoName}`)
+  
   shell.exec(`dir .`)
 
   shell.cd(".."); //back to index
@@ -553,7 +554,6 @@ const pullSchema = (repository, branch) => {
   shell.exec("git init");
   
   shell.exec(`git pull ${repository}`);
-  shell.exec(`git switch ${branch}`)
   shell.cd("..");
   
 };
