@@ -599,7 +599,8 @@ const pushToZapier = async (repoName) => {
     
   }else if(repoName == `${process.env.staging_name}`){ //config_var
     process.env.version = await getVersion(repoName)
-    shell.exec(`npm run pushdynamic`); 
+    shell.cd(`./${process.env.staging_name}`);
+    shell.exec(`zapier push`); 
   }
   //shell.exec('npm run pushdynamicLink')
   
