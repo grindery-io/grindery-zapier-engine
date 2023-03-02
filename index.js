@@ -508,8 +508,8 @@ async function runPayload(value){
 }
 
 app.post("/githubUpdate", async (req, res) => {
-  //const value = JSON.parse(req.body.payload); //PRODUCTION
-  const value = req.body; //TESTING POSTMAN
+  const value = JSON.parse(req.body.payload); //PRODUCTION
+  //const value = req.body; //TESTING POSTMAN
 
   runPayload(value);
   res.status(200).json({ res: "Payload Received successfully. Processing..." });
