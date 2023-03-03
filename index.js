@@ -253,24 +253,32 @@ const getLabelDescriptionAccess = async(element, type) =>{
     
     const parseContent = JSON.parse(fileContent);
     if(type == "trigger"){
-      if(parseContent.description != undefined && parseContent.description != ""){
-        if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
-          description = parseContent.description
+      if(parseContent.triggersDescription && parseContent.triggersDescription.includes("Triggers when") && parseContent.triggersDescription.includes(".")){
+        description = parseContent.triggersDescription
+      } else {
+        if(parseContent.description != undefined && parseContent.description != ""){
+          if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+            description = parseContent.description
+          }else{
+            description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
+          }
         }else{
           description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
         }
-      }else{
-        description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
       }
     }else{
-      if(parseContent.description != undefined && parseContent.description != ""){
-        if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
-          description = `Configure actions using ${parseContent.name} directly in Zapier.`
+      if(parseContent.actionsDescription){
+        description = parseContent.actionsDescription
+      } else {
+        if(parseContent.description != undefined && parseContent.description != ""){
+          if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+            description = `Configure actions using ${parseContent.name} directly in Zapier.`
+          }else{
+            description = `Configure actions using ${parseContent.name} directly in Zapier.`
+          }
         }else{
           description = `Configure actions using ${parseContent.name} directly in Zapier.`
         }
-      }else{
-        description = `Configure actions using ${parseContent.name} directly in Zapier.`
       }
     }
     if(parseContent.access != undefined && parseContent.access == "Public"){
