@@ -73,6 +73,9 @@ async function run(type, cds, repoName, label, description) {
       modified = modified.replace(/replaceTriggerCamelCase/g, camelCase);
       modified = modified.replace(/replaceLabel/g, label);
       modified = modified.replace(/replaceDescription/g, description);
+      if(repoName === `${process.env.staging_name}`){
+        modified = modified.replace('urn:grindery:zapier-gateway', 'urn:grindery:zapier-beta');
+      }
     } else {
       console.log("actions, ",titleCase)
       data = await readFile("actionTemplate.js", "utf8");
