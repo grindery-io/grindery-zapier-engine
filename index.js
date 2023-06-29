@@ -9,8 +9,6 @@ import { keyNames, getBranch } from "./src/Utilities.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
-import {pullAllFiles} from "./pullAllFiles.js"
-
 //import {jsondata} from './erc20.json' assert { type: "json" };
 
 const PORT = process.env.PORT || 5000; //define port
@@ -73,9 +71,6 @@ async function run(type, cds, repoName, label, description) {
       modified = modified.replace(/replaceTriggerCamelCase/g, camelCase);
       modified = modified.replace(/replaceLabel/g, label);
       modified = modified.replace(/replaceDescription/g, description);
-      if(repoName === `${process.env.staging_name}`){
-        modified = modified.replace('urn:grindery:zapier-gateway', 'urn:grindery:zapier-beta');
-      }
     } else {
       console.log("actions, ",titleCase)
       data = await readFile("actionTemplate.js", "utf8");
@@ -210,7 +205,6 @@ const removeFiles = async(cds, repoName) => {
   }
 }
 
-
 const addToIndex = async (value, type, repoName) => {
   let counter = 18;
   // Read the contents of the file
@@ -244,60 +238,48 @@ const addToIndex = async (value, type, repoName) => {
   }
 };
 
-const getLabelDescriptionAccess = async(element, type) =>{
+const getLabelDescriptionAccess = async(element, type, branch) =>{
   try {
     //Trigger = 1, Action = 2 @Juan
-    let deployToStaging = false; //if access = Beta || access property is undefined
     const filePath = `./grindery-nexus-schema-v2/cds/web3/${element}.json`;
    
     const fileContent = await readFile(filePath, "utf8"); // read the file
     let description = ""
-    let access = false
+    let access = true
     
     const parseContent = JSON.parse(fileContent);
     if(type == "trigger"){
-      if(parseContent.triggersDescription && parseContent.triggersDescription.includes("Triggers when") && parseContent.triggersDescription.includes(".")){
-        description = parseContent.triggersDescription
-      } else {
-        if(parseContent.description != undefined && parseContent.description != ""){
-          if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
-            description = parseContent.description
-          }else{
-            description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
-          }
+      if(parseContent.description != undefined && parseContent.description != ""){
+        if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+          description = parseContent.description
         }else{
           description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
         }
+      }else{
+        description = `Triggers when a ${parseContent.name} Blockchain event is initiated.`
       }
     }else{
-      if(parseContent.actionsDescription){
-        description = parseContent.actionsDescription
-      } else {
-        if(parseContent.description != undefined && parseContent.description != ""){
-          if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
-            description = `Configure actions using ${parseContent.name} directly in Zapier.`
-          }else{
-            description = `Configure actions using ${parseContent.name} directly in Zapier.`
-          }
+      if(parseContent.description != undefined && parseContent.description != ""){
+        if(parseContent.description.includes("Triggers when") && parseContent.description.includes(".")){
+          description = `Configure actions using ${parseContent.name} directly in Zapier.`
         }else{
           description = `Configure actions using ${parseContent.name} directly in Zapier.`
         }
+      }else{
+        description = `Configure actions using ${parseContent.name} directly in Zapier.`
       }
     }
-    if(parseContent.access != undefined && parseContent.access == "Public"){
+    if(parseContent.access == undefined || parseContent.access == "Public" ||  parseContent.access == "" || branch == "staging"){
       access = true
-    }
-    if(parseContent.access == undefined || parseContent.access == "Beta"){
-      deployToStaging = true;
+    }else{
+      access = false
     }
 
     const data = {
       name: parseContent.name,
       description: description,
-      access: access,
-      deployToStaging: deployToStaging
+      access: access
     }
-
     console.log(data)
     return data
   }catch(error){
@@ -325,7 +307,6 @@ const hiddenFiles = async(filePath) => {
           lines.splice(index + 2, 0, `    hidden: true,`);
           
           console.log(lines[index + 1])
-          console.log(lines[index + 2])
          
           const res = await writeFile(
               FILE_LOCATION,
@@ -359,8 +340,6 @@ const importantFile = async(filePath) => {
   }; 
 }
 
-
-
 async function runPayload(value){
   //format key name files
   let added = ""
@@ -379,12 +358,15 @@ async function runPayload(value){
   console.log(added)
   //const removed = keyNames(value.commits[0].removed);
   const branch = getBranch(value.ref); //get branch
-  
+  console.log(branch)
   let repoName = ""
-  let staging_repoName = ""
 
-  //remove conditionals & repo
-  /*if(branch == "staging"){
+  //Pull repositories
+  pullSchema(
+    "https://connex-clientaccess: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@github.com/grindery-io/grindery-nexus-schema-v2",
+    branch
+  );
+  if(branch == "staging"){
     //repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
     repoName = `${process.env.staging_name}` //config_var
     pullRepository(
@@ -392,128 +374,70 @@ async function runPayload(value){
       repoName
     );//config_var account_repo
 
-  }else */
-  if(branch == "master"){
-      //Pull repositories
-    pullSchema(
-      `${process.env.account_repo}/grindery-nexus-schema-v2`,
-      "master"
-    );
-    //move items here
-    const infoAction = {};
-    if (added != undefined || removed != undefined || modified != undefined) {
-      //const added= ["erc20", "erc721", "gnosisSafe"]
+  }else if(branch == "master"){
+    repoName = `${process.env.production_name}` //config_var
+    pullRepository(
+      `${process.env.account_repo}${repoName}`,
+      repoName
+    );//config_var account_repo
+  }
   
-      // const removed = keyNames(value.commits[0].removed);
-      // console.log(removed);
-      //counters needed to check if it is neccessary to update the zapier app
-      let master_counter = 0;
-      let staging_counter = 0;
+  if (added != undefined || removed != undefined || modified != undefined) {
+    //const added= ["erc20", "erc721", "gnosisSafe"]
 
-      //get repositories 
-      repoName = `${process.env.production_name}` //config_var
-      pullRepository(
-        `${process.env.account_repo}${repoName}`,
-        repoName
-      );//config_var account_repo
-
-      staging_repoName = `${process.env.staging_name}` //config_var
-      pullRepository(
-        `${process.env.account_repo}${staging_repoName}`,
-        staging_repoName
-      );//config_var account_repo
-      
-      //removed limitation - if no branches
-      if(removed != undefined){
-        for (let index = 0; index < removed.length; index++) {
-          const element = removed[index];
-          await removeFiles(element, repoName)
-          await removeFiles(element, staging_repoName)
-          master_counter++
-          staging_counter++
+    // const removed = keyNames(value.commits[0].removed);
+    // console.log(removed);
+    let counter = 0;
+    
+    if(removed != undefined){
+      for (let index = 0; index < removed.length; index++) {
+        const element = removed[index];
+        await removeFiles(element, repoName)
+        counter++
+      }
+    }
+    if(added != undefined){
+      for (let index = 0; index < added.length; index++) {
+        const element = added[index];
+        const trigger = await checkIftriggerOrAction(element, 1);
+        const action = await checkIftriggerOrAction(element, 2);
+        const infoTrigger = await getLabelDescriptionAccess(element, "trigger", branch)
+        const infoAction = await getLabelDescriptionAccess(element, "action", branch)
+        if (trigger && infoTrigger.access == true) {
+          await runHidden("triggers", element, repoName);
+          await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
+          counter++
+        }
+        if (action && infoAction.access == true) {
+          //TO-DO
+          await runHidden("creates", element, repoName);
+          await run("creates", element, repoName, infoAction.name, infoAction.description);
+          counter++
         }
       }
+    }
+    console.log(branch)
+    if(branch == "staging"){
+      // {
+      //   "id": 174957,
+      //   "key": "App174957"
+      // }
+     
+      await replaceRCfile("staging", repoName)
+      await pushToZapier(repoName)
+    }else if(branch == "master" && counter > 0){
+      // {
+      //   "id": 166926,
+      //   "key": "App166926"
+      // }
+      await replaceRCfile("production", repoName)
+      await pushToZapier(repoName);
+    }
+    if(branch == "master" && counter == 0){
 
-      if(added != undefined){
-
-        //Check the access level of new files for pushing only if it is needed
-        for (let index = 0; index < added.length; index++) {
-          const element = added[index];
-          const trigger = await checkIftriggerOrAction(element, 1);
-          const action = await checkIftriggerOrAction(element, 2);
-          const infoTrigger = await getLabelDescriptionAccess(element, "trigger")
-          const infoAction = await getLabelDescriptionAccess(element, "action")
-          console.log(infoTrigger)
-          if (trigger) {
-            if(infoTrigger.access == true){
-              master_counter++
-            }
-            if(infoTrigger.access == false && infoTrigger.deployToStaging == true){
-              staging_counter++
-            }
-          }
-          if (action) {
-            if(infoAction.access == true){
-            //TO-DO
-            master_counter++
-            }
-            if(infoAction.access == false && infoAction.deployToStaging == true){
-              staging_counter++
-            }
-          }
-        }
-        //Update all files in schema 
-        const allFiles = await pullAllFiles()
-        for (let index = 0; index < allFiles.length; index++) {
-          
-          const element = allFiles[index];
-          const trigger = await checkIftriggerOrAction(element, 1);
-          const action = await checkIftriggerOrAction(element, 2);
-          const infoTrigger = await getLabelDescriptionAccess(element, "trigger")
-          const infoAction = await getLabelDescriptionAccess(element, "action")
-          console.log(infoTrigger)
-          if (trigger && element.length > 1) {
-            if(infoTrigger.access == true){
-
-              await runHidden("triggers", element, repoName);
-              await run("triggers", element, repoName, infoTrigger.name, infoTrigger.description);
-            }
-            if(infoTrigger.access == false && infoTrigger.deployToStaging == true){
-
-              await runHidden("triggers", element, staging_repoName);
-              await run("triggers", element, staging_repoName, infoTrigger.name, infoTrigger.description);
-            }
-          }
-          if (action && element.length > 1) {
-            if(infoAction.access == true){
-            //TO-DO
-            await runHidden("creates", element, repoName);
-            await run("creates", element, repoName, infoAction.name, infoAction.description);
-            }
-            if(infoAction.access == false && infoAction.deployToStaging == true){
-              await runHidden("creates", element, staging_repoName);
-              await run("creates", element, staging_repoName, infoAction.name, infoAction.description);
-            }
-          }
-        }
-      }
-      console.log(staging_counter, master_counter)
-      if(staging_counter > 0){
-        console.log("staging counter")
-        await replaceRCfile("staging", staging_repoName)
-        await pushToZapier(staging_repoName)
-
-      }
-      if(master_counter > 0){
-        console.log("master counter")
-
-        await replaceRCfile("production", repoName)
-        await pushToZapier(repoName);
-
-        const version = await getVersion(repoName)
-        await sendNotification(version, branch, added, removed)
-
-      }
+    }else{
+      const version = await getVersion(repoName)
+      await sendNotification(version, branch, added, removed)
     }
   }
 }
@@ -544,17 +468,15 @@ async function sendNotification(version, branch, added, removed) {
 
 
 const pullRepository = (branch, repoName) => {
-  shell.exec(`mkdir ${repoName}`)
   let path = `./${repoName}`;
   //console.log("root folder")
   //shell.exec(`dir .`)
   shell.cd(path); //inside dynamic
   shell.exec(`git init `);
-  console.log(`${process.env.account_repo}${repoName}`)
-  shell.exec(`git pull ${process.env.account_repo}${repoName}`);
+  shell.exec(`git pull ${process.env.account_repo}${repoName} master`);
   //console.log(path)
   shell.exec(`npm i`);
-  
+  console.log(`${process.env.account_repo}${repoName}`)
   shell.exec(`dir .`)
 
   shell.cd(".."); //back to index
@@ -563,13 +485,12 @@ const pullRepository = (branch, repoName) => {
 };
 
 const pullSchema = (repository, branch) => {
-  shell.exec(`mkdir grindery-nexus-schema-v2`)
   shell.cd("./grindery-nexus-schema-v2");
   shell.exec("git init");
   
-  shell.exec(`git pull ${repository}`);
+  shell.exec(`git pull ${repository} --allow-unrelated-histories`);
+  shell.exec(`git switch ${branch}`)
   shell.cd("..");
-  
 };
 
 const updateVersion = (repoName) => {
@@ -600,7 +521,7 @@ const pushToZapier = async (repoName) => {
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
-    `git push ${process.env.account_repo}${repoName}`
+    `git push -f ${process.env.account_repo}${repoName}`
   );
   //Until here
   console.log("after update version");
@@ -613,8 +534,7 @@ const pushToZapier = async (repoName) => {
     
   }else if(repoName == `${process.env.staging_name}`){ //config_var
     process.env.version = await getVersion(repoName)
-    shell.cd(`./${process.env.staging_name}`);
-    shell.exec(`zapier push`); 
+    shell.exec(`npm run pushdynamic`); 
   }
   //shell.exec('npm run pushdynamicLink')
   
