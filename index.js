@@ -13,7 +13,7 @@ import {pullAllFiles} from "./pullAllFiles.js"
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
 
-const PORT = process.env.PORT || 5000; //define port
+const PORT = process.env.PORT || 5002; //define port
 const app = express(); //Instantiate an express app, the main work horse of this server
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
@@ -623,6 +623,8 @@ const pushToZapier = async (repoName) => {
 app.listen(PORT, () => {
   //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${PORT}`);
+  pullRepository('production', 'grindery-zapier-web3-gateway')
+  pushToZapier('grindery-zapier-web3-gateway-beta')
 });
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
