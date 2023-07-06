@@ -544,7 +544,13 @@ async function sendNotification(version, branch, added, removed) {
 
 
 const pullRepository = (branch, repoName) => {
-  shell.exec(`mkdir ${repoName}`)
+  shell.exec(`git clone ${process.env.account_repo}${repoName}`)
+  let path = `./${repoName}`;
+  shell.cd(path);
+  shell.exec(`npm i`);
+  shell.cd(".."); //back to index
+  console.log("back to root folder")
+  /*shell.exec(`mkdir ${repoName}`)
   let path = `./${repoName}`;
   //console.log("root folder")
   //shell.exec(`dir .`)
@@ -555,11 +561,11 @@ const pullRepository = (branch, repoName) => {
   //console.log(path)
   shell.exec(`npm i`);
   
-  shell.exec(`dir .`)
+  //shell.exec(`dir .`)
 
   shell.cd(".."); //back to index
-  //console.log("back to root folder")
-  //shell.exec(`dir .`)
+  console.log("back to root folder")
+  //shell.exec(`dir .`)*/
 };
 
 const pullSchema = (repository, branch) => {
@@ -583,7 +589,7 @@ const updateClient = () =>{
 
 const pushToZapier = async (repoName) => {
   console.log("root folder");
-  shell.exec("dir .");
+  //shell.exec("dir .");
   const lastversion = await getVersion(repoName)
   let version = lastversion.replace(/(\d+)\.(\d+)\.(\d+)/, function(match, p1, p2, p3) {
     p3 = parseInt(p3) + 1;
@@ -607,16 +613,18 @@ const pushToZapier = async (repoName) => {
   shell.cd("..");
   if(repoName == `${process.env.production_name}`){ //config_var
     shell.cd(`./${process.env.production_name}`);
+    shell.exec(`npm install`);
     shell.exec(`zapier push`); 
-    shell.exec(`zapier promote ${version} -y`); 
-    shell.exec(`zapier migrate ${version} ${lastversion}`); 
+    //shell.exec(`zapier promote ${version} -y`); 
+    //shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
   }else if(repoName == `${process.env.staging_name}`){ //config_var
     process.env.version = await getVersion(repoName)
     shell.cd(`./${process.env.staging_name}`);
     shell.exec(`zapier push`); 
   }
-  //shell.exec('npm run pushdynamicLink')
+  shell.cd("..");
+  shell.exec(`rm -r ./${repoName}`) //delete the folder after
   
 };
 
@@ -624,7 +632,7 @@ app.listen(PORT, () => {
   //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${PORT}`);
   pullRepository('production', 'grindery-zapier-web3-gateway')
-  pushToZapier('grindery-zapier-web3-gateway-beta')
+  pushToZapier('grindery-zapier-web3-gateway')
 });
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
