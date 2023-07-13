@@ -615,8 +615,8 @@ const pushToZapier = async (repoName) => {
     shell.cd(`./${process.env.production_name}`);
     shell.exec(`npm install`);
     shell.exec(`zapier push`); 
-    //shell.exec(`zapier promote ${version} -y`); 
-    //shell.exec(`zapier migrate ${version} ${lastversion}`); 
+    shell.exec(`zapier promote ${version} -y`); 
+    shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
   }else if(repoName == `${process.env.staging_name}`){ //config_var
     process.env.version = await getVersion(repoName)
