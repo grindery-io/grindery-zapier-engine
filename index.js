@@ -601,8 +601,8 @@ const pushToZapier = async (repoName) => {
   updateClient()
   //STOP GITHUB PUSH 
   shell.exec("git init");
-  shell.exec(`git config user.email ${process.env.gitHub_email}`); //config_var
-  shell.exec(`git config user.name ${process.env.gitHub_username}`); //config_var
+  //shell.exec(`git config user.email ${process.env.gitHub_email}`); //config_var
+  //shell.exec(`git config user.name ${process.env.gitHub_username}`); //config_var
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
@@ -631,8 +631,8 @@ const pushToZapier = async (repoName) => {
 app.listen(PORT, () => {
   //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${PORT}`);
-  pullRepository('production', 'grindery-zapier-web3-gateway')
-  pushToZapier('grindery-zapier-web3-gateway')
+  pullRepository('production', 'grindery-zapier-web3-gateway-beta')
+  pushToZapier('grindery-zapier-web3-gateway-beta')
 });
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
