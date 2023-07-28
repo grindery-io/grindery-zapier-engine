@@ -635,8 +635,6 @@ const pushToZapier = async (repoName) => {
 app.listen(PORT, () => {
   //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${PORT}`);
-  pullRepository('production', 'grindery-zapier-web3-gateway')
-  pushToZapier('grindery-zapier-web3-gateway')
 });
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
