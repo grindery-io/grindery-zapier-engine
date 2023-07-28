@@ -8,6 +8,7 @@ import path, { parse } from "path"
 import { keyNames, getBranch } from "./src/Utilities.js";
 import dotenv from 'dotenv';
 dotenv.config();
+import { exec } from "child_process";
 
 import {pullAllFiles} from "./pullAllFiles.js"
 
@@ -210,7 +211,6 @@ const removeFiles = async(cds, repoName) => {
   }
 }
 
-
 const addToIndex = async (value, type, repoName) => {
   let counter = 18;
   // Read the contents of the file
@@ -358,8 +358,6 @@ const importantFile = async(filePath) => {
       } 
   }; 
 }
-
-
 
 async function runPayload(value){
   //format key name files
@@ -615,7 +613,13 @@ const pushToZapier = async (repoName) => {
     shell.cd(`./${process.env.production_name}`);
     shell.exec(`npm install`);
     shell.exec(`zapier push`); 
-    shell.exec(`zapier promote ${version} -y`); 
+    //shell.exec(`zapier promote ${version}`); disabled - prompts on changelog causes this to break
+    exec(`zapier promote ${version} -y`, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`error: ${error.message}`);
+          return;
+      }
+  });
     shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
   }else if(repoName == `${process.env.staging_name}`){ //config_var
@@ -631,8 +635,8 @@ const pushToZapier = async (repoName) => {
 app.listen(PORT, () => {
   //server starts listening for any attempts from a client to connect at port: {port}
   console.log(`Now listening on port ${PORT}`);
-  pullRepository('production', 'grindery-zapier-web3-gateway-beta')
-  pushToZapier('grindery-zapier-web3-gateway-beta')
+  pullRepository('production', 'grindery-zapier-web3-gateway')
+  pushToZapier('grindery-zapier-web3-gateway')
 });
 // app.post("/runPull", async (req, res) => {
 //   let repository = "https://connex-clientaccess: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@github.com/connex-clientaccess/${repoName}"
