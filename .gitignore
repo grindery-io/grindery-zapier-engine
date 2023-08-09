@@ -1,4 +1,6 @@
 **node_modules
 **grindery-nexus-schema-v2
+**grindery-zapier-engine
 **grindery-zapier-web3-gateway-beta
 **grindery-zapier-web3-gateway
+*.env

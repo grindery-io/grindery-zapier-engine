@@ -8,12 +8,13 @@ import path, { parse } from "path"
 import { keyNames, getBranch } from "./src/Utilities.js";
 import dotenv from 'dotenv';
 dotenv.config();
+import { exec } from "child_process";
 
 import {pullAllFiles} from "./pullAllFiles.js"
 
 //import {jsondata} from './erc20.json' assert { type: "json" };
 
-const PORT = process.env.PORT || 5000; //define port
+const PORT = process.env.PORT || 5002; //define port
 const app = express(); //Instantiate an express app, the main work horse of this server
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
@@ -210,7 +211,6 @@ const removeFiles = async(cds, repoName) => {
   }
 }
 
-
 const addToIndex = async (value, type, repoName) => {
   let counter = 18;
   // Read the contents of the file
@@ -358,8 +358,6 @@ const importantFile = async(filePath) => {
       } 
   }; 
 }
-
-
 
 async function runPayload(value){
   //format key name files
@@ -544,7 +542,13 @@ async function sendNotification(version, branch, added, removed) {
 
 
 const pullRepository = (branch, repoName) => {
-  shell.exec(`mkdir ${repoName}`)
+  shell.exec(`git clone ${process.env.account_repo}${repoName}`)
+  let path = `./${repoName}`;
+  shell.cd(path);
+  shell.exec(`npm i`);
+  shell.cd(".."); //back to index
+  console.log("back to root folder")
+  /*shell.exec(`mkdir ${repoName}`)
   let path = `./${repoName}`;
   //console.log("root folder")
   //shell.exec(`dir .`)
@@ -555,11 +559,11 @@ const pullRepository = (branch, repoName) => {
   //console.log(path)
   shell.exec(`npm i`);
   
-  shell.exec(`dir .`)
+  //shell.exec(`dir .`)
 
   shell.cd(".."); //back to index
-  //console.log("back to root folder")
-  //shell.exec(`dir .`)
+  console.log("back to root folder")
+  //shell.exec(`dir .`)*/
 };
 
 const pullSchema = (repository, branch) => {
@@ -583,7 +587,7 @@ const updateClient = () =>{
 
 const pushToZapier = async (repoName) => {
   console.log("root folder");
-  shell.exec("dir .");
+  //shell.exec("dir .");
   const lastversion = await getVersion(repoName)
   let version = lastversion.replace(/(\d+)\.(\d+)\.(\d+)/, function(match, p1, p2, p3) {
     p3 = parseInt(p3) + 1;
@@ -595,8 +599,8 @@ const pushToZapier = async (repoName) => {
   updateClient()
   //STOP GITHUB PUSH 
   shell.exec("git init");
-  shell.exec(`git config user.email ${process.env.gitHub_email}`); //config_var
-  shell.exec(`git config user.name ${process.env.gitHub_username}`); //config_var
+  //shell.exec(`git config user.email ${process.env.gitHub_email}`); //config_var
+  //shell.exec(`git config user.name ${process.env.gitHub_username}`); //config_var
   shell.exec("git add .");
   shell.exec(`git commit -m "some message"`);
   shell.exec(
@@ -607,8 +611,15 @@ const pushToZapier = async (repoName) => {
   shell.cd("..");
   if(repoName == `${process.env.production_name}`){ //config_var
     shell.cd(`./${process.env.production_name}`);
+    shell.exec(`npm install`);
     shell.exec(`zapier push`); 
-    shell.exec(`zapier promote ${version} -y`); 
+    //shell.exec(`zapier promote ${version}`); disabled - prompts on changelog causes this to break
+    exec(`zapier promote ${version} -y`, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`error: ${error.message}`);
+          return;
+      }
+  });
     shell.exec(`zapier migrate ${version} ${lastversion}`); 
     
   }else if(repoName == `${process.env.staging_name}`){ //config_var
@@ -616,7 +627,8 @@ const pushToZapier = async (repoName) => {
     shell.cd(`./${process.env.staging_name}`);
     shell.exec(`zapier push`); 
   }
-  //shell.exec('npm run pushdynamicLink')
+  shell.cd("..");
+  shell.exec(`rm -r ./${repoName}`) //delete the folder after
   
 };
 
