@@ -3,12 +3,12 @@ const NexusClient = require("grindery-nexus-client").default;
 // triggers on a new list_driver_triggers with a certain tag
 const perform = async (z, bundle) => {
   const client = new NexusClient();
-  try{
+  try {
     //z.console.log("attempting to retrieve this id: ", bundle.inputData.driver_id);
-    let response = await client.getDriver("replaceDriver");
+    let response = await client.connector.get({ driverKey: "replaceDriver" });
     // this should return an array of objects
     let driver_triggers = response.triggers;
-    if(driver_triggers){
+    if (driver_triggers) {
       var key_array = [];
       driver_triggers.map((trigger) => {
         key_array.push({
@@ -19,11 +19,14 @@ const perform = async (z, bundle) => {
       });
       z.console.log("Near Triggers: ", key_array);
       return key_array;
-    }else{
+    } else {
       return [];
     }
-  }catch(error){
-    z.console.log("Auth Error in List Driver Triggers (Zapier)-Trigger (list_driver_triggers.js)", error.message);
+  } catch (error) {
+    z.console.log(
+      "Auth Error in List Driver Triggers (Zapier)-Trigger (list_driver_triggers.js)",
+      error.message
+    );
     if (error.message === "Invalid access token") {
       throw new z.errors.RefreshAuthError();
     }
@@ -39,7 +42,7 @@ module.exports = {
   display: {
     label: `replaceTriggerTitleCase Token`,
     description: `Triggers when a new replaceTriggerCamelCase is created.`,
-    hidden:true
+    hidden: true,
   },
 
   operation: {
@@ -54,7 +57,7 @@ module.exports = {
     // returned records, and have obvious placeholder values that we can show to any user.
     sample: {
       id: 1,
-      name: 'Test'
+      name: "Test",
     },
 
     // If fields are custom to each user (like spreadsheet columns), `outputFields` can create human labels
@@ -65,6 +68,6 @@ module.exports = {
       // these are placeholders to match the example `perform` above
       { key: "id", label: "Driver" },
       { key: "title", label: "Driver Label" },
-    ]
-  }
+    ],
+  },
 };
