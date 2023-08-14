@@ -100,9 +100,9 @@ const perform = async (z, bundle) => {
 
         //const nexus_response = await client.runAction(step, input); //optional string 'staging'
         z.console.log("Response from runAction: ", nexus_response);
-        if (nexus_response) {
-          return nexus_response;
-        }
+      }
+      if (nexus_response) {
+        return nexus_response;
       }
     }
   } catch (error) {
