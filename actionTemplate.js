@@ -7,9 +7,44 @@ const replaceActionCamelCase_action_hidden = require("../triggers/replaceActionC
 const perform = async (z, bundle) => {
   //get the selected driver, get the selected actions (and input fields), package the data and run action
   const client = new NexusClient();
-  let step = {}; //step object
-  let input = {}; //input object
+  //let step = {}; //step object
+  //let input = {}; //input object
+
   try {
+    client.authenticate(`${bundle.authData.access_token}`);
+    const credentials = await client.listAuthCredentials(
+      bundle.inputData.driver_id,
+      "production"
+    );
+    const credential = credentials.find(
+      (c) =>
+        c.key === bundle.inputData.auth_credentials ||
+        c.key === bundle.inputData.auth_new_account
+    );
+    const authentication = (credential && credential.token) || undefined;
+    const authenticationKey = (credential && credential.key) || undefined;
+
+    let step = {
+      authentication,
+      authenticationKey,
+    }; //step object
+    let input = { ...bundle.inputData }; //input object
+    delete input.driver_id;
+    delete input.action_id;
+
+    if (input.auth_credentials) {
+      delete input.auth_credentials;
+    }
+    if (input.auth_copy) {
+      delete input.auth_copy;
+    }
+    if (input.auth_completed) {
+      delete input.auth_completed;
+    }
+    if (input.auth_new_account) {
+      delete input.auth_new_account;
+    }
+
     //Get the driver
     let selected_driver_response = await client.getDriver("replaceDriver");
     let selected_driver_actions = selected_driver_response.actions; //get the driver's actions
@@ -48,7 +83,7 @@ const perform = async (z, bundle) => {
           z.console.log("Input Object: ", input);
         }
       }
-      client.authenticate(`${bundle.authData.access_token}`);
+
       const nexus_response = await client.runAction(step, input); //optional string 'staging'
       z.console.log("Response from runAction: ", nexus_response);
       if (nexus_response) {
@@ -97,6 +132,7 @@ module.exports = {
       async function (z, bundle) {
         const client = new NexusClient();
         try {
+          client.authenticate(`${bundle.authData.access_token}`);
           let response = await client.getDriver("replaceDriver");
           //z.console.log("listing driver details: ", response);
           let driver_actions = response.actions; //match the selected driver
@@ -109,6 +145,7 @@ module.exports = {
             let this_selected_action = driver_actions.filter(
               (action) => action.key === bundle.inputData.action_id
             );
+            let inputFields = [];
             if (this_selected_action.length >= 0) {
               //DEBUG MESSAGE
               z.console.log(
@@ -116,6 +153,75 @@ module.exports = {
                 this_selected_action[0]
               );
               if (this_selected_action[0].operation.inputFields.length >= 1) {
+                if (
+                  response.authentication &&
+                  response.authentication.type === "oauth2" &&
+                  this_selected_action[0].authentication !== "none"
+                ) {
+                  const user = client.getUser();
+                  const credentials = await client.listAuthCredentials(
+                    "replaceDriver",
+                    "production"
+                  );
+
+                  const credentialsField = {
+                    key: "auth_credentials",
+                    label: "Select account",
+                    type: "string",
+                    altersDynamicFields: true,
+                  };
+                  let choices = {};
+                  credentials.map((cred) => {
+                    choices[cred.key] = cred.name;
+                  });
+                  choices["add_new"] = "Sign in to a new account";
+                  credentialsField.choices = choices;
+
+                  actionsInputField.push(credentialsField);
+
+                  if (
+                    bundle.inputData.auth_credentials &&
+                    bundle.inputData.auth_credentials === "add_new"
+                  ) {
+                    const authLink = `https://orchestrator.grindery.org/credentials/staging/replaceDriver/auth?access_token=${
+                      bundle.authData.access_token
+                    }&redirect_uri=https://flow.grindery.org/complete_auth/${
+                      user.workspace || "default"
+                    }`;
+
+                    actionsInputField.push({
+                      key: "auth_copy",
+                      label: "Authentication",
+                      type: "copy",
+                      helpText: `Please, click the link and follow sign-in process: [Sign-in](${authLink}).`,
+                    });
+                    actionsInputField.push({
+                      key: "auth_completed",
+                      label: "I have completed the sign in flow",
+                      type: "boolean",
+                      default: "false",
+                      helpText:
+                        "Set to TRUE once you are done with authentication",
+                      altersDynamicFields: true,
+                    });
+
+                    if (
+                      bundle.inputData.auth_completed &&
+                      bundle.inputData.auth_completed !== "false" &&
+                      credentials.length > 0
+                    ) {
+                      actionsInputField.push({
+                        key: "auth_new_account",
+                        label: "New account",
+                        type: "string",
+                        default: credentials[credentials.length - 1].key,
+                        helpText: credentials[credentials.length - 1].name,
+                        altersDynamicFields: true,
+                      });
+                    }
+                  }
+                }
+
                 let filtered_action_fields =
                   this_selected_action[0].operation.inputFields.filter(
                     (action) => !action.computed
@@ -173,10 +279,31 @@ module.exports = {
                       ...temp,
                     };
                   }
-                  actionsInputField.push(temp);
+                  if (
+                    response.authentication &&
+                    response.authentication.type === "oauth2" &&
+                    this_selected_action[0].authentication !== "none" &&
+                    ((bundle.inputData.auth_credentials &&
+                      bundle.inputData.auth_credentials === "add_new" &&
+                      bundle.inputData.auth_completed &&
+                      bundle.inputData.auth_completed !== "false") ||
+                      (bundle.inputData.auth_credentials &&
+                        bundle.inputData.auth_credentials !== "add_new"))
+                  ) {
+                    actionsInputField.push(temp);
+                  } else {
+                    if (
+                      !response.authentication ||
+                      response.authentication.type !== "oauth2" ||
+                      this_selected_action[0].authentication === "none"
+                    ) {
+                      actionsInputField.push(temp);
+                    }
+                  }
                 });
-                return actionsInputField;
+                inputFields = [...inputFields, ...actionsInputField];
               }
+              return inputFields;
             }
           }
         } catch (error) {
