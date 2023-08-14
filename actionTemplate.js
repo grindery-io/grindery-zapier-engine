@@ -97,10 +97,8 @@ const perform = async (z, bundle) => {
           input: { _grinderyChain: chain, ...input },
           environment: ENVIRONMENT,
         });
-
-        //const nexus_response = await client.runAction(step, input); //optional string 'staging'
-        z.console.log("Response from runAction: ", nexus_response);
       }
+      z.console.log("Response from runAction: ", nexus_response);
       if (nexus_response) {
         return nexus_response;
       }
