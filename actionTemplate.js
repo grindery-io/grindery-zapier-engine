@@ -84,7 +84,7 @@ const perform = async (z, bundle) => {
       if (bundle.meta.isLoadingSample) {
         nexus_response = await client.connector.testAction({
           step,
-          input: { _grinderyChain: chain, ...input },
+          input,
           environment: ENVIRONMENT,
           source: workflowSource[ENVIRONMENT] || workflowSource[0],
         });
@@ -94,7 +94,7 @@ const perform = async (z, bundle) => {
         nexus_response = await client.connector.runActionAsync({
           callbackUrl,
           step,
-          input: { _grinderyChain: chain, ...input },
+          input,
           environment: ENVIRONMENT,
         });
       }
