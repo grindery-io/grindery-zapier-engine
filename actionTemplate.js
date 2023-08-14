@@ -85,8 +85,8 @@ const perform = async (z, bundle) => {
         nexus_response = await client.connector.testAction({
           step,
           input,
-          environment: ENVIRONMENT,
-          source: workflowSource[ENVIRONMENT] || workflowSource[0],
+          environment: "production",
+          source: "urn:grindery:zapier-gateway",
         });
       } else {
         const callbackUrl = z.generateCallbackUrl();
@@ -95,7 +95,7 @@ const perform = async (z, bundle) => {
           callbackUrl,
           step,
           input,
-          environment: ENVIRONMENT,
+          environment: "production",
         });
       }
       z.console.log("Response from runAction: ", nexus_response);
