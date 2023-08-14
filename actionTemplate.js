@@ -7,7 +7,7 @@ const perform = async (z, bundle) => {
   try {
     const client = new NexusClient(bundle.authData.access_token);
     const credentials = await client.credentials.list({
-      connectorId: bundle.inputData.driver_id,
+      connectorId: "replaceDriver",
       environment: "production",
     });
     const credential = credentials.find(
@@ -56,7 +56,7 @@ const perform = async (z, bundle) => {
         //get actions input fields, https://docs.google.com/document/d/14arNus32sKeovhfmVbGncXA6F93mdWix-cGm8RxoyL0/edit#heading=h.t91p0v8eq5q8
         step = {
           type: "action", //always action
-          connector: driver_id,
+          connector: "replaceDriver",
           operation: bundle.inputData.action_id,
         };
         z.console.log("Step Object: ", step); //DEBUG log to confirm correct structure
