@@ -3,19 +3,13 @@ const NexusClient = require("grindery-nexus-client").default;
 const driver_id = "replaceActionCamelCase";
 const replaceActionCamelCase_action_hidden = require("../triggers/replaceActionCamelCase_action_hidden");
 
-// create a particular run_grindery_action by name
 const perform = async (z, bundle) => {
-  //get the selected driver, get the selected actions (and input fields), package the data and run action
-  const client = new NexusClient();
-  //let step = {}; //step object
-  //let input = {}; //input object
-
   try {
-    client.authenticate(`${bundle.authData.access_token}`);
-    const credentials = await client.listAuthCredentials(
-      bundle.inputData.driver_id,
-      "production"
-    );
+    const client = new NexusClient(bundle.authData.access_token);
+    const credentials = await client.credentials.list({
+      connectorId: bundle.inputData.driver_id,
+      environment: "production",
+    });
     const credential = credentials.find(
       (c) =>
         c.key === bundle.inputData.auth_credentials ||
@@ -46,7 +40,9 @@ const perform = async (z, bundle) => {
     }
 
     //Get the driver
-    let selected_driver_response = await client.getDriver("replaceDriver");
+    let selected_driver_response = await client.connector.get({
+      driverKey: "replaceDriver",
+    });
     let selected_driver_actions = selected_driver_response.actions; //get the driver's actions
     let filteredActionArray = [];
     //get the selected driver action
@@ -84,10 +80,29 @@ const perform = async (z, bundle) => {
         }
       }
 
-      const nexus_response = await client.runAction(step, input); //optional string 'staging'
-      z.console.log("Response from runAction: ", nexus_response);
-      if (nexus_response) {
-        return nexus_response;
+      let nexus_response;
+      if (bundle.meta.isLoadingSample) {
+        nexus_response = await client.connector.testAction({
+          step,
+          input: { _grinderyChain: chain, ...input },
+          environment: ENVIRONMENT,
+          source: workflowSource[ENVIRONMENT] || workflowSource[0],
+        });
+      } else {
+        const callbackUrl = z.generateCallbackUrl();
+
+        nexus_response = await client.connector.runActionAsync({
+          callbackUrl,
+          step,
+          input: { _grinderyChain: chain, ...input },
+          environment: ENVIRONMENT,
+        });
+
+        //const nexus_response = await client.runAction(step, input); //optional string 'staging'
+        z.console.log("Response from runAction: ", nexus_response);
+        if (nexus_response) {
+          return nexus_response;
+        }
       }
     }
   } catch (error) {
@@ -100,6 +115,22 @@ const perform = async (z, bundle) => {
     } else {
       z.console.log("Error in run_grindery_action: ", error.message);
     }
+  }
+};
+
+const performResumeAction = async (z, bundle) => {
+  z.console.log(
+    "Response from runActionAsync callback: ",
+    bundle.cleanedRequest
+  );
+  if (
+    bundle.cleanedRequest &&
+    bundle.cleanedRequest.success &&
+    bundle.cleanedRequest.result
+  ) {
+    return bundle.cleanedRequest.result;
+  } else {
+    throw new z.errors.Error(bundle.cleanedRequest.error || "Unknown error");
   }
 };
 
@@ -116,7 +147,7 @@ module.exports = {
 
   operation: {
     perform,
-
+    performResume: performResumeAction,
     // `inputFields` defines the fields a user could provide
     // Zapier will pass them in as `bundle.inputData` later. They're optional.
     // End-users will map data into these fields. In general, they should have any fields that the API can accept. Be sure to accurately mark which fields are required!
@@ -130,10 +161,11 @@ module.exports = {
         dynamic: "replaceActionCamelCase_action_hidden.key",
       },
       async function (z, bundle) {
-        const client = new NexusClient();
         try {
-          client.authenticate(`${bundle.authData.access_token}`);
-          let response = await client.getDriver("replaceDriver");
+          const client = new NexusClient(bundle.authData.access_token);
+          let response = await client.connector.get({
+            driverKey: "replaceDriver",
+          });
           //z.console.log("listing driver details: ", response);
           let driver_actions = response.actions; //match the selected driver
           let choices = {};
@@ -158,12 +190,11 @@ module.exports = {
                   response.authentication.type === "oauth2" &&
                   this_selected_action[0].authentication !== "none"
                 ) {
-                  const user = client.getUser();
-                  const credentials = await client.listAuthCredentials(
-                    "replaceDriver",
-                    "production"
-                  );
-
+                  const user = client.user.get();
+                  const credentials = await client.credentials.list({
+                    connectorId: "replaceDriver",
+                    environment: "production",
+                  });
                   const credentialsField = {
                     key: "auth_credentials",
                     label: "Select account",

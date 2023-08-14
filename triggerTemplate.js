@@ -115,9 +115,8 @@ const subscribeHook = async (z, bundle) => {
     let action = {}; //action after creating trigger
     let workflow = {}; //main workflow object
     try {
-      const client = new NexusClient();
-      client.authenticate(`${bundle.authData.access_token}`);
-      let thisDriver = await client.getDriver(driver_id); //
+      const client = new NexusClient(bundle.authData.access_token);
+      let thisDriver = await client.connector.get({ driverKey: driver_id }); //
       let driver_triggers = thisDriver.triggers;
       z.console.log("Selected Driver ", driver_triggers);
 
@@ -158,10 +157,10 @@ const subscribeHook = async (z, bundle) => {
               }
             });
           }
-          const credentials = await client.listAuthCredentials(
-            bundle.inputData.driver_id,
-            "production"
-          );
+          const credentials = await client.credentials.list({
+            connectorId: bundle.inputData.driver_id,
+            environment: "production",
+          });
           const credential = credentials.find(
             (c) =>
               c.key === bundle.inputData.auth_credentials ||
@@ -225,12 +224,13 @@ const subscribeHook = async (z, bundle) => {
 
           //z.console.log("Workflow Object: ", workflow);
 
-          const user = client.getUser();
+          const user = client.user.get();
           //z.console.log("Attempting to create this workflow: ", workflow);
-          const create_workflow_response = await client.createWorkflow(
+          const create_workflow_response = await client.workflow.create({
             workflow,
-            user.workspace || undefined
-          );
+            workspaceKey: user.workspace || undefined,
+          });
+
           const data = await z.JSON.parse(response.content);
 
           //TODO: handle possible errors
@@ -335,11 +335,10 @@ module.exports = {
       },
       async function (z, bundle) {
         console.log("Running Async function");
-        const client = new NexusClient();
-        client.authenticate(`${bundle.authData.access_token}`);
+        const client = new NexusClient(bundle.authData.access_token);
         let this_cds_trigger_options = {};
         try {
-          let response = await client.getDriver(driver_id);
+          let response = await client.connector.get({ driverKey: driver_id });
           z.console.log("Driver Response: ", response);
           let driver_triggers = response.triggers;
           let choices = {};
@@ -358,11 +357,11 @@ module.exports = {
                 response.authentication.type === "oauth2" &&
                 this_selected_trigger[0].authentication !== "none"
               ) {
-                const user = client.getUser();
-                const credentials = await client.listAuthCredentials(
-                  bundle.inputData.driver_id || "",
-                  "production"
-                );
+                const user = client.user.get();
+                const credentials = await client.credentials.list({
+                  connectorId: bundle.inputData.driver_id || "",
+                  environment: "production",
+                });
                 z.console.log("credentials", credentials);
                 const credentialsField = {
                   key: "auth_credentials",

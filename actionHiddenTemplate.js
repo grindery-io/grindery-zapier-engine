@@ -2,9 +2,9 @@ const NexusClient = require("grindery-nexus-client").default;
 
 // triggers on a new list_driver_actions with a certain tag
 const perform = async (z, bundle) => {
-  const client = new NexusClient();
+  const client = new NexusClient(bundle.authData.access_token || undefined);
   try {
-    let response = await client.getDriver("replaceDriver");
+    let response = await client.connector.get({ driverKey: "replaceDriver" });
     z.console.log("List Driver Response: ", response);
     // this should return an array of objects
     let driver_actions = response.actions;
